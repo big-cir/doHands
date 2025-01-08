@@ -1,4 +1,4 @@
-package com.be.dohands.common.config;
+package com.be.dohands.common;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
