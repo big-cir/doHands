@@ -1,0 +1,16 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    container_name: dohands
+    ports:
+      - "3306:3306"
+    env_file:
+      - local.env
+    environment:
+      MYSQL_DATABASE: dohands
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

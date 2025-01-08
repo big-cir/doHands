@@ -7,6 +7,8 @@ spring:
     url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/dohands?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Seoul
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
+  config:
+    import: optional:file:local.env[.properties]
 
   jpa:
     hibernate:
