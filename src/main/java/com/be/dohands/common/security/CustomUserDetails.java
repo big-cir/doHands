@@ -8,12 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
-    private String id;
+    private String loginId;
     private String password;
     private Role role;
 
-    public CustomUserDetails(String id, String password, Role role) {
-        this.id = id;
+    public CustomUserDetails(String loginId, String password, Role role) {
+        this.loginId = loginId;
         this.password = password;
         this.role = role;
     }
@@ -32,7 +32,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return id;
+        return loginId;
     }
 
     @Override
