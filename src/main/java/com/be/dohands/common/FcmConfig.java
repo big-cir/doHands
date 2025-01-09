@@ -13,10 +13,10 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 public class FcmConfig {
 
-    @Value("${fcm.account-path}")
+    @Value("${firebase.service-account-path}")
     private String serviceAccountPath;
 
-    @Value("${fcm.project-id")
+    @Value("${firebase.project-id")
     private String projectId;
 
     @Bean

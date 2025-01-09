@@ -1,4 +1,4 @@
-package com.be.dohands.readerQuest;
+package com.be.dohands.evaluation;
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -11,19 +11,15 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class LeaderQuestExp extends BaseTimeEntity {
+public class EvaluationExp extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long leaderQuestExpId;
+    private Long evaluationExpId;
 
     private String employeeNumber;
 
-    private String questName;
-
-    private String content;
+    private String grade;
 
     private Integer exp;
-
-    private Long leaderQuestId;
 }
