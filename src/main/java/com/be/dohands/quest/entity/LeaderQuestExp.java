@@ -1,4 +1,4 @@
-package com.be.dohands.leaderQuest;
+package com.be.dohands.quest.entity;
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;

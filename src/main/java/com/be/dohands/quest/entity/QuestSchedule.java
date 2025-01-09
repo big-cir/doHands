@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "questSchedule")
+@Table(name = "QuestSchedule")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

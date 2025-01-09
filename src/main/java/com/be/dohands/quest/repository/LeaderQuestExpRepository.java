@@ -1,6 +1,6 @@
-package com.be.dohands.leaderQuest.repository;
+package com.be.dohands.quest.repository;
 
-import com.be.dohands.leaderQuest.LeaderQuestExp;
+import com.be.dohands.quest.entity.LeaderQuestExp;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

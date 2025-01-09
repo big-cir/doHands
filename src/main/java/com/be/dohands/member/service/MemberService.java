@@ -1,7 +1,7 @@
 package com.be.dohands.member.service;
 
 import com.be.dohands.evaluation.repository.EvaluationExpRepository;
-import com.be.dohands.jobQuest.service.JobQuestService;
+import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.dto.CreateMemberDto;
@@ -10,7 +10,7 @@ import com.be.dohands.member.dto.QuestExpDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
-import com.be.dohands.leaderQuest.repository.LeaderQuestExpRepository;
+import com.be.dohands.quest.repository.LeaderQuestExpRepository;
 import com.be.dohands.tf.repository.TfExpRepository;
 import java.util.ArrayList;
 import java.util.Collections;
