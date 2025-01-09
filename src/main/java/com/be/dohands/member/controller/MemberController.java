@@ -4,10 +4,12 @@ import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.dto.CreateMemberDto;
 import com.be.dohands.member.dto.MemberExpStatusDto;
+import com.be.dohands.member.dto.MemberSlice;
 import com.be.dohands.member.dto.MultiCursorResult;
 import com.be.dohands.member.dto.QuestExpConditionDto;
 import com.be.dohands.member.dto.QuestExpDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
+import com.be.dohands.member.service.MemberAdminService;
 import com.be.dohands.member.service.MemberService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -27,23 +29,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberAdminService memberAdminService;
 
     @PostMapping("/admin/sign-up")
     public ResponseEntity<Void> createMember(@RequestBody CreateMemberDto createMemberDto) {
-        memberService.saveMember(createMemberDto);
+        memberAdminService.saveMember(createMemberDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .build();
     }
 
     @GetMapping("/admin/users")
-    public ResponseEntity<List<Member>> getMember(@RequestParam(required = false) String name) {
-        return ResponseEntity.ok(memberService.findMember(name));
+    public ResponseEntity<MemberSlice> getMembers(@RequestParam String next, @RequestParam int size,
+                                                  @RequestParam(required = false) String name) {
+        return ResponseEntity.ok(memberAdminService.findMembers(name, next, size));
     }
 
     @PatchMapping("/admin/users/{userId}")
     public ResponseEntity<Member> updateMember(@PathVariable("userId") Long userId, @RequestBody UpdateMemberDto updateMemberDto) {
-        return ResponseEntity.ok(memberService.modifyMember(userId, updateMemberDto));
+        return ResponseEntity.ok(memberAdminService.modifyMember(userId, updateMemberDto));
     }
 
     @GetMapping("/users/quests/experience")
