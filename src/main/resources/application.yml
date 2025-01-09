@@ -18,3 +18,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
+
+firebase:
+  service-account-path: ${ACCOUNT_PATH}
+  url: https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send
+  google-api: https://www.googleapis.com/auth/cloud-platform
+  project-id: ${PROJECT_ID}
