@@ -29,7 +29,7 @@ public class LoginController {
     public ResponseEntity<Void> login(@RequestBody LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDto.id(), loginDto.password()));
+                    new UsernamePasswordAuthenticationToken(loginDto.loginId(), loginDto.password()));
 
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream()

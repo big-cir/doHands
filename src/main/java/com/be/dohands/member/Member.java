@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,22 +31,34 @@ public class Member extends BaseTimeEntity {
 
     private String name;
 
-    private String character;
+    private String characterType;
 
     private Long levelId;
 
-    private LocalDateTime hireDate;
+    private LocalDate hireDate;
 
     private Long skinId;
 
     @Enumerated(EnumType.STRING)
     private final Role role = Role.ROLE_USER;
 
-    public Member(String loginId, String employeeNumber, String department, String name) {
+    public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate) {
+        this.name = name;
         this.loginId = loginId;
         this.password = "1234";
         this.employeeNumber = employeeNumber;
         this.department = department;
+        this.levelId = levelId;
+        this.hireDate = hireDate;
+        this.characterType = "default";
+    }
+
+    public void updateMember(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate) {
         this.name = name;
+        this.loginId = loginId;
+        this.employeeNumber = employeeNumber;
+        this.department = department;
+        this.levelId = levelId;
+        this.hireDate = hireDate;
     }
 }
