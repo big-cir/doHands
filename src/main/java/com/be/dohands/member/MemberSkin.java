@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class UserArticle extends BaseTimeEntity {
+public class MemberSkin extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userArticleId;
+    private Long userSkinId;
 
     private Long userId;
 
-    private Long articleId;
+    private Long skinId;
 }

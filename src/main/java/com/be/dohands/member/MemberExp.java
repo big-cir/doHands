@@ -16,7 +16,7 @@ public class MemberExp extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long memberExpId;
+    private Long userExpId;
 
     private Integer year;
 

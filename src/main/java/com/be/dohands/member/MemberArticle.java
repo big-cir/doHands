@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class UserBadge extends BaseTimeEntity {
+public class MemberArticle extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userBadgeId;
+    private Long userArticleId;
 
     private Long userId;
 
-    private Long badgeId;
+    private Long articleId;
 }
