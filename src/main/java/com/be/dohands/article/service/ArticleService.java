@@ -2,7 +2,9 @@ package com.be.dohands.article.service;
 
 import com.be.dohands.article.Article;
 import com.be.dohands.article.dto.CreateArticleDto;
+import com.be.dohands.article.dto.GetArticleDto;
 import com.be.dohands.article.repository.ArticleRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,5 +19,9 @@ public class ArticleService {
     public void saveArticle(CreateArticleDto dto) {
         Article article = new Article(dto.title(), dto.content());
         articleRepository.save(article);
+
     }
+
+//    @Transactional(readOnly = true)
+//    public List<GetArticleDto> find
 }

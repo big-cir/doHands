@@ -4,6 +4,8 @@ import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.dto.CreateMemberDto;
 import com.be.dohands.member.dto.MemberExpStatusDto;
+import com.be.dohands.member.dto.MultiCursorResult;
+import com.be.dohands.member.dto.QuestExpConditionDto;
 import com.be.dohands.member.dto.QuestExpDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.service.MemberService;
@@ -45,9 +47,12 @@ public class MemberController {
     }
 
     @GetMapping("/users/quests/experience")
-    public ResponseEntity<List<QuestExpDto>> getQuestsExperience(@AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<MultiCursorResult<QuestExpDto>> getQuestsExperience(
+            @RequestParam("cursor") String cursor, @RequestParam("size") int size,
+            @AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
-        return ResponseEntity.ok(memberService.findQuestExpsById(loginId));
+        QuestExpConditionDto questExpConditionDto = new QuestExpConditionDto(cursor, size);
+        return ResponseEntity.ok(memberService.findQuestExpsById(loginId, questExpConditionDto));
     }
 
     @GetMapping("/users/experience")
