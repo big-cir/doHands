@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,13 +39,13 @@ public class Member extends BaseTimeEntity {
     private Long skinId;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.ROLE_USER;
+    private final Role role = Role.ROLE_USER;
 
     private String jobGroup;
 
     private Integer sheetRow;
 
-    public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate) {
+    public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup, Integer sheetRow) {
         this.name = name;
         this.loginId = loginId;
         this.password = "1234";
@@ -55,14 +54,17 @@ public class Member extends BaseTimeEntity {
         this.levelId = levelId;
         this.hireDate = hireDate;
         this.characterType = "default";
+        this.jobGroup = jobGroup;
+        this.sheetRow = sheetRow;
     }
 
-    public void updateMember(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate) {
+    public void updateMember(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup) {
         this.name = name;
         this.loginId = loginId;
         this.employeeNumber = employeeNumber;
         this.department = department;
         this.levelId = levelId;
         this.hireDate = hireDate;
+        this.jobGroup = jobGroup;
     }
 }
