@@ -9,6 +9,7 @@ import com.be.dohands.member.dto.MultiCursorResult;
 import com.be.dohands.member.dto.QuestExpConditionDto;
 import com.be.dohands.member.dto.QuestExpDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
+import com.be.dohands.member.dto.UpdateProfileDto;
 import com.be.dohands.member.service.MemberAdminService;
 import com.be.dohands.member.service.MemberService;
 import lombok.RequiredArgsConstructor;

@@ -8,7 +8,7 @@ import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.quest.repository.LeaderQuestExpQueryRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
-import com.be.dohands.member.controller.UpdateProfileDto;
+import com.be.dohands.member.dto.UpdateProfileDto;
 import com.be.dohands.member.dto.CursorResult;
 import com.be.dohands.member.dto.MemberExpStatusDto;
 import com.be.dohands.member.dto.MultiCursor;

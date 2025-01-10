@@ -10,23 +10,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: ldh
+      - name: Login to Docker Registry
         uses: docker/login-action@v3.0.0
         with:
           username: ${{ secrets.DI }}
           password: ${{ secrets.DP }}
 
-      - name: bdi
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
-        env:
-          DU: ${{ secrets.DI }}
         with:
           context: .
           push: true
           tags: |
-            ${{ env.DU }}/dohands:latest
-            ${{ env.DU }}/dohands:${{ github.sha }}
-      - name: dts
+            ${{ secrets.DI }}/dohands:latest
+
+      - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_PRIVATE_PATH }}
@@ -35,4 +33,4 @@ jobs:
           script: |
             sudo docker-compose down
             sudo docker pull ${{ secrets.DI }}/dohands:latest
-            sudo docker-compose up --build -d
+            sudo docker-compose up -d
