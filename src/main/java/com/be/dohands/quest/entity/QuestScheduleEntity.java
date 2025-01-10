@@ -19,7 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class QuestSchedule extends BaseTimeEntity {
+public class QuestScheduleEntity extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long questScheduleId;

@@ -3,6 +3,7 @@ package com.be.dohands.quest.entity;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import com.be.dohands.quest.data.QuestType;
+import com.be.dohands.quest.data.StatusType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,7 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserQuest {
+public class UserQuestEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long userQuestId;
@@ -33,5 +34,7 @@ public class UserQuest {
     private Long userId;
 
     private Long questScheduleId;
+
+    private StatusType statusType;
 
 }

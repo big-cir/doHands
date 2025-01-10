@@ -5,36 +5,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class JobQuestExp extends BaseTimeEntity {
+public class LeaderQuestExpEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long jobQuestExpId;
+    private Long leaderQuestExpId;
 
-    private Float maxStandard;
+    private String employeeNumber;
 
-    private Float medianStandard;
+    private String questName;
 
-    private Integer period;
-
-    private Integer productivity;
-
-    private Integer month;
-
-    private Integer week;
-
-    private LocalDateTime endDate;
+    private String content;
 
     private Integer exp;
 
-    private Long jobQuestId;
+    private Long leaderQuestId;
 }

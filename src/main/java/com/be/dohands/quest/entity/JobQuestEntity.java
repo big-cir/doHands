@@ -11,19 +11,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class LeaderQuestExp extends BaseTimeEntity {
+public class JobQuestEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long leaderQuestExpId;
+    private Long jobQuestId;
 
-    private String employeeNumber;
+    private Integer maxExp;
 
-    private String questName;
+    private Integer medianExp;
 
-    private String content;
+    private String department;
 
-    private Integer exp;
+    private String jobGroup;
 
-    private Long leaderQuestId;
+    private String period;
 }

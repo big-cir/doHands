@@ -1,10 +1,10 @@
 package com.be.dohands.quest.repository;
 
-import com.be.dohands.quest.entity.LeaderQuestExp;
+import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface LeaderQuestExpRepository extends JpaRepository<LeaderQuestExp, Long> {
+public interface LeaderQuestExpRepository extends JpaRepository<LeaderQuestExpEntity, Long> {
 
-    List<LeaderQuestExp> findLeaderQuestExpsByEmployeeNumber(String employeeNumber);
+    List<LeaderQuestExpEntity> findLeaderQuestExpsByEmployeeNumber(String employeeNumber);
 }
