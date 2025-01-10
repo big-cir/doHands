@@ -1,8 +1,10 @@
+version: '3.8'
+
 services:
   mysql:
     image: mysql:8.0
     restart: unless-stopped
-    container_name: dohands
+    container_name: mysql
     ports:
       - "3306:3306"
     env_file:
@@ -11,6 +13,24 @@ services:
       MYSQL_DATABASE: dohands
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  backend:
+    build: ./
+    container_name: backend
+    ports:
+      - "8080:8080"
+    env_file: ../local.env
+    restart: always
+    depends_on:
+      - mysql
+    networks:
+      - app-network
 
 volumes:
   mysql_data:
+
+networks:
+  app-network:
+    driver: bridge

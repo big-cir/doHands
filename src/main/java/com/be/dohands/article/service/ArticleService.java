@@ -36,7 +36,7 @@ public class ArticleService {
         Long nextId = next == null ? null : Long.parseLong(next);
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         ArticleSlice articles = articleQueryRepository.findAllArticles(nextId, size);
-        articles.getItems().stream()
+        articles.getItems()
                 .forEach(item -> {
                     if (memberArticleRepository.findMemberArticleByUserIdAndAndArticleId(member.getUserId(),
                             item.getArticleId()).isPresent()) {

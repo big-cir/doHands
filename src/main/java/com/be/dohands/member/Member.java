@@ -67,4 +67,14 @@ public class Member extends BaseTimeEntity {
         this.hireDate = hireDate;
         this.jobGroup = jobGroup;
     }
+
+    public void updateProfile(String password, String characterType) {
+        if (password != null && !password.isEmpty() && !password.isBlank()) {
+            this.password = password;
+        }
+
+        if (characterType != null && !characterType.isEmpty() && !characterType.isBlank()) {
+            this.characterType = characterType;
+        }
+    }
 }
