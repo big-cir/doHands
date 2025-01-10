@@ -3,7 +3,6 @@ package com.be.dohands.quest.entity;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 import com.be.dohands.base.BaseTimeEntity;
-import com.be.dohands.common.data.QuestType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

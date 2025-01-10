@@ -1,4 +1,4 @@
-package com.be.dohands.common.data;
+package com.be.dohands.quest.entity;
 
 import lombok.Getter;
 
