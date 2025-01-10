@@ -1,6 +1,6 @@
-package com.be.dohands.jobQuest.repository;
+package com.be.dohands.quest.repository;
 
-import com.be.dohands.jobQuest.JobQuest;
+import com.be.dohands.quest.entity.JobQuest;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
