@@ -18,12 +18,14 @@ jobs:
 
       - name: bdi
         uses: docker/build-push-action@v5
+        env:
+          DU: ${{ secrets.DI }}
         with:
           context: .
           push: true
           tags: |
-            ${{ secrets.DI }}/dohands:latest
-            ${{ secrets.DI }}/dohands:${{ github.sha }}
+            ${{ env.DU }}/dohands:latest
+            ${{ env.DU }}/dohands:${{ github.sha }}
       - name: dts
         uses: appleboy/ssh-action@master
         with:
