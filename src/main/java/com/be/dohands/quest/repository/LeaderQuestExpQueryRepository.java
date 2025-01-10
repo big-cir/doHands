@@ -1,9 +1,9 @@
 package com.be.dohands.quest.repository;
 
-import static com.be.dohands.quest.entity.QLeaderQuestExp.leaderQuestExp;
+import static com.be.dohands.quest.entity.QLeaderQuestExpEntity.leaderQuestExpEntity;
 
-import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import com.be.dohands.member.dto.CursorResult;
+import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,11 +24,11 @@ public class LeaderQuestExpQueryRepository {
             return new CursorResult<>(Collections.emptyList(), "-1");
         }
 
-        JPAQuery<LeaderQuestExpEntity> ipq = factory.selectFrom(leaderQuestExp)
-                .where(leaderQuestExp.employeeNumber.eq(employeeNumber));
+        JPAQuery<LeaderQuestExpEntity> ipq = factory.selectFrom(leaderQuestExpEntity)
+                .where(leaderQuestExpEntity.employeeNumber.eq(employeeNumber));
 
         if (cursor == null) {
-            List<LeaderQuestExpEntity> rq = ipq.orderBy(leaderQuestExp.createdAt.desc())
+            List<LeaderQuestExpEntity> rq = ipq.orderBy(leaderQuestExpEntity.createdAt.desc())
                     .limit(size)
                     .fetch();
 
@@ -38,7 +38,7 @@ public class LeaderQuestExpQueryRepository {
         }
 
         List<LeaderQuestExpEntity> rq = ipq.where(cursorCondition(cursor))
-                .orderBy(leaderQuestExp.createdAt.desc())
+                .orderBy(leaderQuestExpEntity.createdAt.desc())
                 .limit(size)
                 .fetch();
 
@@ -51,6 +51,6 @@ public class LeaderQuestExpQueryRepository {
     }
 
     private BooleanExpression cursorCondition(String cursor) {
-        return leaderQuestExp.createdAt.lt(LocalDateTime.parse(cursor));
+        return leaderQuestExpEntity.createdAt.lt(LocalDateTime.parse(cursor));
     }
 }

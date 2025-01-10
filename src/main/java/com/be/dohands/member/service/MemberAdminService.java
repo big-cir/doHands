@@ -41,7 +41,7 @@ public class MemberAdminService {
     public Member modifyMember(Long userId, UpdateMemberDto dto) {
         Member member = memberRepository.findById(userId).orElseThrow();
         member.updateMember(dto.name(), dto.loginId(), dto.employeeNumber(), dto.department(),
-                dto.levelId(), dto.hireDate());
+                dto.levelId(), dto.hireDate(), dto.jobGroup());
         memberRepository.save(member);
         return member;
     }

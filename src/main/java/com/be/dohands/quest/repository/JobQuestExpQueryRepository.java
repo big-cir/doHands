@@ -1,6 +1,6 @@
 package com.be.dohands.quest.repository;
 
-import static com.be.dohands.quest.entity.QJobQuestExp.jobQuestExp;
+import static com.be.dohands.quest.entity.QJobQuestExpEntity.jobQuestExpEntity;
 
 import com.be.dohands.member.dto.CursorResult;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
@@ -24,11 +24,11 @@ public class JobQuestExpQueryRepository {
             return new CursorResult<>(Collections.emptyList(), "-1");
         }
 
-        JPAQuery<JobQuestExpEntity> ipq = factory.selectFrom(jobQuestExp)
-                .where(jobQuestExp.jobQuestId.in(jobQuestIds));
+        JPAQuery<JobQuestExpEntity> ipq = factory.selectFrom(jobQuestExpEntity)
+                .where(jobQuestExpEntity.jobQuestId.in(jobQuestIds));
 
         if (cursor == null) {
-            List<JobQuestExpEntity> rq = ipq.orderBy(jobQuestExp.createdAt.desc())
+            List<JobQuestExpEntity> rq = ipq.orderBy(jobQuestExpEntity.createdAt.desc())
                     .limit(size)
                     .fetch();
 
@@ -38,7 +38,7 @@ public class JobQuestExpQueryRepository {
         }
 
         List<JobQuestExpEntity> rq = ipq.where(cursorCondition(cursor))
-                .orderBy(jobQuestExp.createdAt.desc())
+                .orderBy(jobQuestExpEntity.createdAt.desc())
                 .limit(size)
                 .fetch();
 
@@ -51,6 +51,6 @@ public class JobQuestExpQueryRepository {
     }
 
     private BooleanExpression cursorCondition(String cursor) {
-        return jobQuestExp.createdAt.lt(LocalDateTime.parse(cursor));
+        return jobQuestExpEntity.createdAt.lt(LocalDateTime.parse(cursor));
     }
 }
