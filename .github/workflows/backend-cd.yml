@@ -1,0 +1,21 @@
+name: dohands server
+on:
+  push:
+    branches:
+      - "main"
+     
+jobs:
+  server-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_PRIVATE_PATH }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/be
+            sudo git pull
+            sudo docker-compose down
+            sudo docker-compose up --build -d
