@@ -40,7 +40,11 @@ public class Member extends BaseTimeEntity {
     private Long skinId;
 
     @Enumerated(EnumType.STRING)
-    private final Role role = Role.ROLE_USER;
+    private Role role = Role.ROLE_USER;
+
+    private String jobGroup;
+
+    private Integer sheetRow;
 
     public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate) {
         this.name = name;
