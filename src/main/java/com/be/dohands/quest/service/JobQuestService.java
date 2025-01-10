@@ -1,8 +1,9 @@
-package com.be.dohands.quest.service;
+package com.be.dohands.jobQuest.service;
 
-import com.be.dohands.quest.repository.JobQuestExpRepository;
-import com.be.dohands.quest.repository.JobQuestRepository;
-import com.be.dohands.member.dto.QuestExpDto;
+import com.be.dohands.jobQuest.JobQuest;
+import com.be.dohands.jobQuest.JobQuestDetail;
+import com.be.dohands.jobQuest.repository.JobQuestRepository;
+import com.be.dohands.member.dto.CursorResult;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,15 @@ import org.springframework.stereotype.Service;
 public class JobQuestService {
 
     private final JobQuestRepository jobQuestRepository;
-    private final JobQuestExpRepository jobQuestExpRepository;
 
-    public List<QuestExpDto> findJobQuestExpByDepartment(String department) {
-        return jobQuestExpRepository.findJobQuestDetailsByDepartment(department)
+    private final JobQuestDetailService jobQuestDetailService;
+
+    public CursorResult<JobQuestDetail> findJobQuestExpByDepartment(String department, String cursor, int size) {
+        List<Long> ids = jobQuestRepository.findJobQuestsByDepartment(department)
                 .stream()
-                .map(questDetail -> new QuestExpDto(department, questDetail.getExp()))
+                .map(JobQuest::getJobQuestId)
                 .toList();
+
+        return jobQuestDetailService.findJobQuestDetailByIds(ids, cursor, size);
     }
 }

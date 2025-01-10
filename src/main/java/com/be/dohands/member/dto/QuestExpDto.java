@@ -1,4 +1,6 @@
 package com.be.dohands.member.dto;
 
-public record QuestExpDto(String questName, int exp) {
+import java.time.LocalDateTime;
+
+public record QuestExpDto(Long itemId, String questName, int exp, String itemType, LocalDateTime createdAt) {
 }
