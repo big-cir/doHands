@@ -3,9 +3,9 @@ package com.be.dohands.member.service;
 import static com.be.dohands.member.dto.QuestResult.processQuestType;
 
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
-import com.be.dohands.jobQuest.JobQuestDetail;
-import com.be.dohands.jobQuest.service.JobQuestService;
-import com.be.dohands.leaderQuest.repository.LeaderQuestExpQueryRepository;
+import com.be.dohands.quest.entity.JobQuestExpEntity;
+import com.be.dohands.quest.service.JobQuestService;
+import com.be.dohands.quest.repository.LeaderQuestExpQueryRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.controller.UpdateProfileDto;
@@ -88,7 +88,7 @@ public class MemberService {
 
         QuestResult jobQuestResult = processQuestType(
                 () -> findJobQuestExpByDepartment(department, multiCursor.getJobQuestExpCursor(), size),
-                quest -> new QuestExpDto(quest.getJobQuestDetailId(), quest.getProductivity().toString(), quest.getExp(), questType[3], quest.getCreatedAt()));
+                quest -> new QuestExpDto(quest.getJobQuestExpId(), quest.getProductivity().toString(), quest.getExp(), questType[3], quest.getCreatedAt()));
         questExpDtos.addAll(jobQuestResult.items());
 
         questExpDtos.sort((a, b) -> {
@@ -121,7 +121,7 @@ public class MemberService {
         }
     }
 
-    private CursorResult<JobQuestDetail> findJobQuestExpByDepartment(String department, String cursor, int size) {
+    private CursorResult<JobQuestExpEntity> findJobQuestExpByDepartment(String department, String cursor, int size) {
         return jobQuestService.findJobQuestExpByDepartment(department, cursor, size);
     }
 }

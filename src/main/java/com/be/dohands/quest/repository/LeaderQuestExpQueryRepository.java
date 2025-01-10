@@ -1,8 +1,8 @@
-package com.be.dohands.leaderQuest.repository;
+package com.be.dohands.quest.repository;
 
-import static com.be.dohands.leaderQuest.QLeaderQuestExp.leaderQuestExp;
+import static com.be.dohands.quest.entity.QLeaderQuestExp.leaderQuestExp;
 
-import com.be.dohands.leaderQuest.LeaderQuestExp;
+import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import com.be.dohands.member.dto.CursorResult;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -19,16 +19,16 @@ public class LeaderQuestExpQueryRepository {
 
     private final JPAQueryFactory factory;
 
-    public CursorResult<LeaderQuestExp> findLeaderQuestExpsByEmployeeNumber(String employeeNumber, String cursor, int size) {
+    public CursorResult<LeaderQuestExpEntity> findLeaderQuestExpsByEmployeeNumber(String employeeNumber, String cursor, int size) {
         if (cursor != null && cursor.equals("-1")) {
             return new CursorResult<>(Collections.emptyList(), "-1");
         }
 
-        JPAQuery<LeaderQuestExp> ipq = factory.selectFrom(leaderQuestExp)
+        JPAQuery<LeaderQuestExpEntity> ipq = factory.selectFrom(leaderQuestExp)
                 .where(leaderQuestExp.employeeNumber.eq(employeeNumber));
 
         if (cursor == null) {
-            List<LeaderQuestExp> rq = ipq.orderBy(leaderQuestExp.createdAt.desc())
+            List<LeaderQuestExpEntity> rq = ipq.orderBy(leaderQuestExp.createdAt.desc())
                     .limit(size)
                     .fetch();
 
@@ -37,13 +37,13 @@ public class LeaderQuestExpQueryRepository {
                     rq.isEmpty() ? "-1" : rq.get(0).getCreatedAt().toString());
         }
 
-        List<LeaderQuestExp> rq = ipq.where(cursorCondition(cursor))
+        List<LeaderQuestExpEntity> rq = ipq.where(cursorCondition(cursor))
                 .orderBy(leaderQuestExp.createdAt.desc())
                 .limit(size)
                 .fetch();
 
         int rSize = rq.size();
-        CursorResult<LeaderQuestExp> result = new CursorResult<>(
+        CursorResult<LeaderQuestExpEntity> result = new CursorResult<>(
                 rq,
                 rq.isEmpty() ? "-1" : rq.get(0).getCreatedAt().toString());
         if (rSize < size) result.updateLast();

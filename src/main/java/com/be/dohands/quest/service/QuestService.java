@@ -1,0 +1,71 @@
+package com.be.dohands.quest.service;
+
+import com.be.dohands.member.Member;
+import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.quest.data.QuestType;
+import com.be.dohands.quest.dto.QuestListResponseDTO;
+import com.be.dohands.quest.dto.QuestListResponseDTO.Quest;
+import com.be.dohands.quest.entity.LeaderQuestEntity;
+import com.be.dohands.quest.entity.QuestScheduleEntity;
+import com.be.dohands.quest.entity.UserQuestEntity;
+import com.be.dohands.quest.repository.LeaderQuestRepository;
+import com.be.dohands.quest.repository.QuestScheduleRepository;
+import com.be.dohands.quest.repository.UserQuestRepository;
+import java.util.List;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class QuestService {
+
+    private final MemberRepository memberRepository;
+    private final UserQuestRepository userQuestRepository;
+    private final LeaderQuestRepository leaderQuestRepository;
+    private final QuestScheduleRepository questScheduleRepository;
+
+    @Transactional(readOnly = true)
+    public QuestListResponseDTO getQuestList(String loginId){
+        Member user = memberRepository.findByLoginId(loginId).orElseThrow();
+        Long userId = user.getUserId();
+
+        List<UserQuestEntity> userQuest = userQuestRepository.findAllByUserId(userId);
+        List<Quest> quests = userQuest.stream().map(e -> {
+
+            Integer month = null;
+            Integer week = null;
+            String questName = null;
+
+            Optional<QuestScheduleEntity> questSchedule = questScheduleRepository.findById(e.getQuestScheduleId());
+
+            if (e.getQuestType().equals(QuestType.LEADER)){
+                Optional<LeaderQuestEntity> leaderQuest = leaderQuestRepository.findById(e.getQuestId());
+                if (leaderQuest.isPresent()) questName = leaderQuest.get().getQuestName();
+            }
+            else {
+                if (questSchedule.isPresent()) {
+                    if (questSchedule.get().getMonth() != null) month = questSchedule.get().getMonth();
+                    else week = questSchedule.get().getWeek();
+                }
+            }
+
+            return Quest.builder()
+                .questId(e.getQuestId())
+                .questName(questName)
+                .month(month)
+                .week(week)
+                .questType(e.getQuestType())
+                .statusType(e.getStatusType())
+                .build();
+        }).toList();
+
+        return QuestListResponseDTO.builder()
+            .leaderQuestDetailList(quests)
+            .build();
+    }
+}

@@ -1,4 +1,4 @@
-package com.be.dohands.leaderQuest;
+package com.be.dohands.quest.entity;
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class LeaderQuestExp extends BaseTimeEntity {
+public class LeaderQuestExpEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

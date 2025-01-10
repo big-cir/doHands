@@ -1,4 +1,4 @@
-package com.be.dohands.jobQuest;
+package com.be.dohands.quest.entity;
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -6,17 +6,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
-public class JobQuestDetail extends BaseTimeEntity {
+public class JobQuestExpEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long jobQuestDetailId;
+    private Long jobQuestExpId;
 
     private Float maxStandard;
 
