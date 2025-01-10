@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "JobQuestExp")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
