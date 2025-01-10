@@ -11,7 +11,6 @@ import com.be.dohands.member.dto.QuestExpDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.service.MemberAdminService;
 import com.be.dohands.member.service.MemberService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +62,11 @@ public class MemberController {
     public ResponseEntity<MemberExpStatusDto> getMemberExpStatus(@AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
         return ResponseEntity.ok(memberService.findMemberExpById(loginId));
+    }
+
+    @PatchMapping("/users")
+    public ResponseEntity<Member> updateProfile(@RequestBody UpdateProfileDto updateProfileDto, @AuthenticationPrincipal CustomUserDetails user) {
+        String loginId = user.getUsername();
+        return ResponseEntity.ok(memberService.modifyProfile(updateProfileDto, loginId));
     }
 }

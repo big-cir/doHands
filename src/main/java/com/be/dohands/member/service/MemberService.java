@@ -8,6 +8,7 @@ import com.be.dohands.jobQuest.service.JobQuestService;
 import com.be.dohands.leaderQuest.repository.LeaderQuestExpQueryRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
+import com.be.dohands.member.controller.UpdateProfileDto;
 import com.be.dohands.member.dto.CursorResult;
 import com.be.dohands.member.dto.MemberExpStatusDto;
 import com.be.dohands.member.dto.MultiCursor;
@@ -57,6 +58,13 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         MemberExp memberExp = memberExpRepository.findByUserId(member.getUserId()).orElseThrow();
         return new MemberExpStatusDto(memberExp.getCurrentExp(), memberExp.getCumulativeExp());
+    }
+
+    @Transactional
+    public Member modifyProfile(UpdateProfileDto updateProfileDto, String loginId) {
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow();
+        member.updateProfile(updateProfileDto.changePassword(), updateProfileDto.characterType());
+        return memberRepository.save(member);
     }
 
     private MultiCursorResult<QuestExpDto> findQuestExpWithoutJobQuestByEmployeeNumber(String employeeNumber, String department, MultiCursor multiCursor, int size) {
