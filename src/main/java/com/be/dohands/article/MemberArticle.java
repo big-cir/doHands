@@ -1,4 +1,4 @@
-package com.be.dohands.member;
+package com.be.dohands.article;
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -20,4 +20,9 @@ public class MemberArticle extends BaseTimeEntity {
     private Long userId;
 
     private Long articleId;
+
+    public MemberArticle(Long userId, Long articleId) {
+        this.userId = userId;
+        this.articleId = articleId;
+    }
 }

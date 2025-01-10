@@ -1,38 +1,27 @@
 package com.be.dohands.member.service;
 
-import com.be.dohands.evaluation.EvaluationExp;
-import com.be.dohands.evaluation.repository.EvaluationExpRepository;
+import static com.be.dohands.member.dto.QuestResult.processQuestType;
+
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
 import com.be.dohands.jobQuest.JobQuestDetail;
 import com.be.dohands.jobQuest.service.JobQuestService;
-import com.be.dohands.leaderQuest.LeaderQuestExp;
 import com.be.dohands.leaderQuest.repository.LeaderQuestExpQueryRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
-import com.be.dohands.member.dto.CreateMemberDto;
 import com.be.dohands.member.dto.CursorResult;
 import com.be.dohands.member.dto.MemberExpStatusDto;
 import com.be.dohands.member.dto.MultiCursor;
 import com.be.dohands.member.dto.MultiCursorResult;
 import com.be.dohands.member.dto.QuestExpConditionDto;
 import com.be.dohands.member.dto.QuestExpDto;
-import com.be.dohands.member.dto.UpdateMemberDto;
+import com.be.dohands.member.dto.QuestResult;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
-import com.be.dohands.leaderQuest.repository.LeaderQuestExpRepository;
-import com.be.dohands.tf.TfExp;
 import com.be.dohands.tf.repository.TfExpQueryRepository;
-import com.be.dohands.tf.repository.TfExpRepository;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +39,6 @@ public class MemberService {
     private final JobQuestService jobQuestService;
 
     private static final String[] questType = {"evaluation", "leader", "tf", "job"};
-
 
     @Transactional(readOnly = true)
     public MultiCursorResult<QuestExpDto> findQuestExpsById(String loginId, QuestExpConditionDto questExpConditionDto) {
@@ -106,37 +94,17 @@ public class MemberService {
             typeCount.put(item.itemType(), item.createdAt().toString());
         }
 
-        updateCursor(questType[0], multiCursor, evaluationResult.cursorResult, typeCount);
-        updateCursor(questType[1], multiCursor, leaderQuestResult.cursorResult, typeCount);
-        updateCursor(questType[2], multiCursor, tfResult.cursorResult, typeCount);
-        updateCursor(questType[3], multiCursor, jobQuestResult.cursorResult, typeCount);
+        updateCursor(questType[0], multiCursor, evaluationResult.cursorResult(), typeCount);
+        updateCursor(questType[1], multiCursor, leaderQuestResult.cursorResult(), typeCount);
+        updateCursor(questType[2], multiCursor, tfResult.cursorResult(), typeCount);
+        updateCursor(questType[3], multiCursor, jobQuestResult.cursorResult(), typeCount);
 
         boolean hasNext = questExpDtos.size() > size;
 
         return new MultiCursorResult<>(resultItems, multiCursor.serialize(), hasNext);
     }
 
-    private record QuestResult(List<QuestExpDto> items, CursorResult<?> cursorResult) {}
-
-    private <T> QuestResult processQuestType(
-            Supplier<CursorResult<T>> fetchData,
-            Function<T, QuestExpDto> mapper
-    ) {
-        CursorResult<T> cursorResult = fetchData.get();
-        List<QuestExpDto> items = cursorResult.getItems()
-                .stream()
-                .map(mapper)
-                .toList();
-
-        return new QuestResult(items, cursorResult);
-    }
-
-    private void updateCursor(
-            String questType,
-            MultiCursor multiCursor,
-            CursorResult<?> cursorResult,
-            Map<String, String> typeCount
-    ) {
+    private void updateCursor(String questType, MultiCursor multiCursor, CursorResult<?> cursorResult, Map<String, String> typeCount) {
         String cursor = cursorResult.getCursor();
         if (cursor != null) {
             String newCursor = cursorResult.isLast() ? "-1"

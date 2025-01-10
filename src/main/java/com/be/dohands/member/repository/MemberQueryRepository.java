@@ -16,9 +16,9 @@ public class MemberQueryRepository {
 
     private final JPAQueryFactory factory;
 
-    public MemberSlice findAllMembers(Long lastUserId, int size) {
+    public MemberSlice findAllMembers(Long next, int size) {
         List<Member> members = factory.selectFrom(member)
-                .where(gtUserId(lastUserId))
+                .where(gtNext(next))
                 .orderBy(member.userId.asc())
                 .limit(size)
                 .fetch();
@@ -26,32 +26,31 @@ public class MemberQueryRepository {
         return sliceResult(size, members);
     }
 
-    public MemberSlice findMembersByName(String name, Long lastUserId, int size) {
+    public MemberSlice findMembersByName(String name, Long next, int size) {
         List<Member> members = factory.selectFrom(member)
-                .where(member.name.eq(name).and(gtUserId(lastUserId)))
+                .where(member.name.eq(name).and(gtNext(next)))
                 .orderBy(member.userId.asc())
                 .limit(size)
                 .fetch();
 
         return sliceResult(size, members);
     }
-
 
     private MemberSlice sliceResult(int size, List<Member> members) {
         boolean hasNext = false;
-        Long lastUserId = null;
-        if (members != null && members.size() > size) {
-            lastUserId = members.get(members.size() - 1).getUserId();
+        Long next = null;
+        if (members != null && members.size() >= size) {
+            next = members.get(members.size() - 1).getUserId();
             hasNext = true;
         }
 
-        return new MemberSlice(members, lastUserId, hasNext);
+        return new MemberSlice(members, next, hasNext);
     }
 
-    private BooleanExpression gtUserId(Long userId) {
-        if (userId == null) {
+    private BooleanExpression gtNext(Long next) {
+        if (next == null) {
             return null;
         }
-        return member.userId.gt(userId);
+        return member.userId.gt(next);
     }
 }
