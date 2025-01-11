@@ -40,6 +40,7 @@ public class QuestService {
             Integer month = null;
             Integer week = null;
             String questName = null;
+            Long userQuestId = userQuestRepository.findByQuestTypeAndQuestId(e.getQuestType(), e.getQuestId());;
 
             Optional<QuestScheduleEntity> questSchedule = questScheduleRepository.findById(e.getQuestScheduleId());
 
@@ -61,6 +62,7 @@ public class QuestService {
                 .week(week)
                 .questType(e.getQuestType())
                 .statusType(e.getStatusType())
+                .userQuestId(userQuestId)
                 .build();
         }).toList();
 

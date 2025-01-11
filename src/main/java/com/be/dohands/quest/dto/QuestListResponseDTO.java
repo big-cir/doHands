@@ -26,5 +26,6 @@ public class QuestListResponseDTO {
         private Integer week;
         private QuestType questType;
         private StatusType statusType;
+        private Long userQuestId;
     }
 }
