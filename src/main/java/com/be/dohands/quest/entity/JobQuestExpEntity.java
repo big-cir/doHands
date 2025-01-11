@@ -26,7 +26,7 @@ public class JobQuestExpEntity extends BaseTimeEntity {
 
     private Integer period;
 
-    private Integer productivity;
+    private Float productivity;
 
     private Integer month;
 
@@ -37,4 +37,6 @@ public class JobQuestExpEntity extends BaseTimeEntity {
     private Integer exp;
 
     private Long jobQuestId;
+
+    private String notes;
 }

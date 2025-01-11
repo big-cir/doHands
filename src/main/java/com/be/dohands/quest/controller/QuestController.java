@@ -1,5 +1,7 @@
 package com.be.dohands.quest.controller;
 
+import com.be.dohands.quest.dto.JobQuestDetailResponseDTO;
+import com.be.dohands.quest.dto.LeaderQuestDetailResponseDTO;
 import com.be.dohands.quest.dto.QuestListResponseDTO;
 import com.be.dohands.quest.service.QuestService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,18 @@ public class QuestController {
     @GetMapping("/{userId}")
     public ResponseEntity<QuestListResponseDTO> getQuests(@PathVariable("userId") String userId){
         QuestListResponseDTO response = questService.getQuestList(userId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/leader/{userQuestId}")
+    public ResponseEntity<LeaderQuestDetailResponseDTO> getLeaderQuestDetail(@PathVariable Long userQuestId){
+        LeaderQuestDetailResponseDTO response = questService.getLeaderQuestDetail(userQuestId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/job/{userQusetId}")
+    public ResponseEntity<JobQuestDetailResponseDTO> getJobQuestDetail(@PathVariable Long userQusetId){
+        JobQuestDetailResponseDTO response = questService.getJobQuestDetail(userQusetId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

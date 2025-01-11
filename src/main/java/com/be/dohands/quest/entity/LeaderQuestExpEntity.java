@@ -26,4 +26,6 @@ public class LeaderQuestExpEntity extends BaseTimeEntity {
     private Integer exp;
 
     private Long leaderQuestId;
+
+    private String notes;
 }
