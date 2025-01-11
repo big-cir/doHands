@@ -27,9 +27,9 @@ public class LeaderQuestEntity extends BaseTimeEntity {
 
     private Integer exp;
 
-    private Integer maxScore;
+    private Integer maxExp;
 
-    private Integer medianScore;
+    private Integer medianExp;
 
     private String maxStandard;
 
