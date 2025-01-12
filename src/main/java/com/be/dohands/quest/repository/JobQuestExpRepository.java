@@ -12,4 +12,6 @@ public interface JobQuestExpRepository extends JpaRepository<JobQuestExpEntity, 
     @Query("SELECT qd FROM JobQuestExpEntity qd JOIN JobQuestEntity jq ON qd.jobQuestId = jq.jobQuestId WHERE jq.department = :department")
     List<JobQuestExpEntity> findJobQuestDetailsByDepartment(@Param("department") String department);
     Optional<JobQuestExpEntity> findByJobQuestExpId(Long questExpId);
+
+    Optional<JobQuestExpEntity> findBySheetRow(Integer sheetRow);
 }
