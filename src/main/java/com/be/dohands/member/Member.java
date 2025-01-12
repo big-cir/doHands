@@ -43,6 +43,8 @@ public class Member extends BaseTimeEntity {
 
     private String jobGroup;
 
+    private String jobCategory;
+
     private Integer sheetRow;
 
     public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup, Integer sheetRow) {
