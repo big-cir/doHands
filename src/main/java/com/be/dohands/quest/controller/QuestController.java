@@ -42,4 +42,10 @@ public class QuestController {
         JobQuestDetailResponseDTO response = questService.getJobQuestDetail(userQusetId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<QuestStatisticsResponseDTO> getQuestStatistics(@AuthenticationPrincipal CustomUserDetails auth, QuestStatisticsRequestDTO request){
+        QuestStatisticsResponseDTO response = questService.getQuestStatistics(auth.getUsername(), request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

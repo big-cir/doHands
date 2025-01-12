@@ -35,6 +35,7 @@ public class UserQuestEntity {
 
     private Long questScheduleId;
 
+    @Enumerated(value = EnumType.STRING)
     private StatusType statusType;
 
 }
