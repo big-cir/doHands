@@ -22,6 +22,7 @@ public class SpreadSheetService {
     private final ArticleProcessor articleProcessor;
     private final TfExpProcessor tfExpProcessor;
     private final JobQuestProcessor jobQuestProcessor;
+    private final LevelExpProcessor levelExpProcessor;
 
     private final MemberRepository memberRepository;
 
@@ -42,6 +43,11 @@ public class SpreadSheetService {
     public void readAndUpdateJobRequestSheet(Map<String, Object> payload) {
         jobQuestProcessor.readDividedSheetAndUpdateDb(payload);
     }
+
+    public void readAndUpdateLevelExpSheet(Map<String, Object> payload) {
+        levelExpProcessor.readSheetAndUpdateDb(payload);
+    }
+
 
     public void changeMemberPassword(String spreadsheetId, String password, Long userId)
         throws GeneralSecurityException, IOException {
