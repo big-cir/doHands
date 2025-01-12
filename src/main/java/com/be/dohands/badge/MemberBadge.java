@@ -1,4 +1,4 @@
-package com.be.dohands.member;
+package com.be.dohands.badge;
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;

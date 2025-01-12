@@ -33,9 +33,9 @@ public class QuestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/job/{userQusetId}")
-    public ResponseEntity<JobQuestDetailResponseDTO> getJobQuestDetail(@PathVariable Long userQusetId){
-        JobQuestDetailResponseDTO response = questService.getJobQuestDetail(userQusetId);
+    @GetMapping("/job/{userQuestId}")
+    public ResponseEntity<JobQuestDetailResponseDTO> getJobQuestDetail(@PathVariable Long userQuestId){
+        JobQuestDetailResponseDTO response = questService.getJobQuestDetail(userQuestId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -67,6 +67,11 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    @Transactional(readOnly = true)
+    public Member findMember(String loginId) {
+        return memberRepository.findByLoginId(loginId).get();
+    }
+
     private MultiCursorResult<QuestExpDto> findQuestExpWithoutJobQuestByEmployeeNumber(String employeeNumber, String department, MultiCursor multiCursor, int size) {
         List<QuestExpDto> questExpDtos = new ArrayList<>();
         Map<String, String> typeCount = new HashMap<>();

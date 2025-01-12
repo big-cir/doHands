@@ -65,6 +65,12 @@ public class MemberController {
         return ResponseEntity.ok(memberService.findMemberExpById(loginId));
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<Member> getMember(@AuthenticationPrincipal CustomUserDetails user) {
+        String loginId = user.getUsername();
+        return ResponseEntity.ok(memberService.findMember(loginId));
+    }
+
     @PatchMapping("/users")
     public ResponseEntity<Member> updateProfile(@RequestBody UpdateProfileDto updateProfileDto, @AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
