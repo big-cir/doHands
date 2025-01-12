@@ -27,4 +27,11 @@ public class MemberExp extends BaseTimeEntity {
     private Integer cumulativeExp;
 
     private Long userId;
+
+    public MemberExp(Integer year, Long userId) {
+        this.year = year;
+        this.currentExp = 0;
+        this.cumulativeExp = 0;
+        this.userId = userId;
+    }
 }

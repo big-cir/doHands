@@ -3,12 +3,13 @@ package com.be.dohands.member.service;
 import static com.be.dohands.member.dto.QuestResult.processQuestType;
 
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
+import com.be.dohands.member.dto.UpdateCharacterDto;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
 import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.quest.repository.LeaderQuestExpQueryRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
-import com.be.dohands.member.dto.UpdateProfileDto;
+import com.be.dohands.member.dto.UpdatePasswordDto;
 import com.be.dohands.member.dto.CursorResult;
 import com.be.dohands.member.dto.MemberExpStatusDto;
 import com.be.dohands.member.dto.MultiCursor;
@@ -61,9 +62,16 @@ public class MemberService {
     }
 
     @Transactional
-    public Member modifyProfile(UpdateProfileDto updateProfileDto, String loginId) {
+    public Member modifyPassword(UpdatePasswordDto updatePasswordDto, String loginId) {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
-        member.updateProfile(updateProfileDto.changePassword(), updateProfileDto.characterType());
+        member.updatePassword(updatePasswordDto.changePassword());
+        return memberRepository.save(member);
+    }
+
+    @Transactional
+    public Member modifyCharacter(UpdateCharacterDto updateCharacterDto, String loginId) {
+        Member member = memberRepository.findByLoginId(loginId).orElseThrow();
+        member.updateCharacter(updateCharacterDto.characterType());
         return memberRepository.save(member);
     }
 

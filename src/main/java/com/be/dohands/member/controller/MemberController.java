@@ -8,8 +8,9 @@ import com.be.dohands.member.dto.MemberSlice;
 import com.be.dohands.member.dto.MultiCursorResult;
 import com.be.dohands.member.dto.QuestExpConditionDto;
 import com.be.dohands.member.dto.QuestExpDto;
+import com.be.dohands.member.dto.UpdateCharacterDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
-import com.be.dohands.member.dto.UpdateProfileDto;
+import com.be.dohands.member.dto.UpdatePasswordDto;
 import com.be.dohands.member.service.MemberAdminService;
 import com.be.dohands.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -71,9 +72,15 @@ public class MemberController {
         return ResponseEntity.ok(memberService.findMember(loginId));
     }
 
-    @PatchMapping("/users")
-    public ResponseEntity<Member> updateProfile(@RequestBody UpdateProfileDto updateProfileDto, @AuthenticationPrincipal CustomUserDetails user) {
+    @PatchMapping("/users/password")
+    public ResponseEntity<Member> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto, @AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
-        return ResponseEntity.ok(memberService.modifyProfile(updateProfileDto, loginId));
+        return ResponseEntity.ok(memberService.modifyPassword(updatePasswordDto, loginId));
+    }
+
+    @PatchMapping("/users/character")
+    public ResponseEntity<Member> updateCharacter(@RequestBody UpdateCharacterDto updateCharacterDto, @AuthenticationPrincipal CustomUserDetails user) {
+        String loginId = user.getUsername();
+        return ResponseEntity.ok(memberService.modifyCharacter(updateCharacterDto, loginId));
     }
 }
