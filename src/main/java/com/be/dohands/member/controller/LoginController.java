@@ -2,7 +2,10 @@ package com.be.dohands.member.controller;
 
 import com.be.dohands.common.JwtUtil;
 import com.be.dohands.common.security.CustomUserDetails;
+import com.be.dohands.member.Member;
+import com.be.dohands.member.Role;
 import com.be.dohands.member.dto.LoginDto;
+import com.be.dohands.member.dto.LoginResponse;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.notification.service.FcmService;
 import java.util.List;
@@ -29,7 +32,7 @@ public class LoginController {
     private final FcmService fcmService;
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.loginId(), loginDto.password()));
@@ -44,10 +47,13 @@ public class LoginController {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + token);
 
-            Long userId = memberRepository.findByLoginId(loginDto.loginId()).get().getUserId();
+            Member member = memberRepository.findByLoginId(loginDto.loginId()).get();
+            Long userId = member.getUserId();
             fcmService.saveToken(loginDto.fcmToken(), userId);
 
-            return ResponseEntity.ok().headers(headers).build();
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(new LoginResponse(userId, member.getRole().equals(Role.ROLE_ADMIN)));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
