@@ -8,11 +8,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Member extends BaseTimeEntity {
 
@@ -70,11 +74,13 @@ public class Member extends BaseTimeEntity {
         this.jobGroup = jobGroup;
     }
 
-    public void updateProfile(String password, String characterType) {
+    public void updatePassword(String password) {
         if (password != null && !password.isEmpty() && !password.isBlank()) {
             this.password = password;
         }
+    }
 
+    public void updateCharacter(String characterType) {
         if (characterType != null && !characterType.isEmpty() && !characterType.isBlank()) {
             this.characterType = characterType;
         }

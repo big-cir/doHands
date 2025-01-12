@@ -1,4 +1,4 @@
 package com.be.dohands.member.dto;
 
-public record LoginDto(String loginId, String password) {
+public record LoginDto(String loginId, String password, String fcmToken) {
 }

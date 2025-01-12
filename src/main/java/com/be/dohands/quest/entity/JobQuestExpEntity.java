@@ -7,11 +7,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class JobQuestExpEntity extends BaseTimeEntity {
@@ -39,4 +41,6 @@ public class JobQuestExpEntity extends BaseTimeEntity {
     private Long jobQuestId;
 
     private String notes;
+
+    private Integer sheetRow;
 }

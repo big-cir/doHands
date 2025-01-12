@@ -1,4 +1,5 @@
-package com.be.dohands.member;
+package com.be.dohands.notification.entity;
+
 
 import com.be.dohands.base.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -11,13 +12,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class MemberBadge extends BaseTimeEntity {
+public class FcmTokenEntity extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userBadgeId;
+    private Long fcmTokenId;
+
+    private String token;
 
     private Long userId;
 
-    private Long badgeId;
+    private boolean isActive;
+
+    public FcmTokenEntity(String token, Long userId) {
+        this.token = token;
+        this.userId = userId;
+        this.isActive = true;
+    }
 }
