@@ -35,6 +35,9 @@ public class SheetController {
             case "참고. 전사 프로젝트":
                 sheetService.readAndUpdateTfExpSheet(payload);
                 break;
+            case "참고. 레벨별 경험치":
+                sheetService.readAndUpdateLevelExpSheet(payload);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown sheet name: " + sheetName);
         }
