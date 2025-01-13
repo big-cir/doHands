@@ -12,6 +12,7 @@ import com.be.dohands.member.repository.MemberQueryRepository;
 import com.be.dohands.member.repository.MemberRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class MemberAdminService {
     @Transactional
     public void saveMember(CreateMemberDto dto) {
         if (!memberRepository.existsByLoginId(dto.loginId())) {
-            LevelExp level = levelExpRepository.findLevelExpByName(dto.level()).orElse(null);
+            LevelExp level = findLevelExpByName(dto.level());
             Member member = memberRepository.save(dto.toMember(level != null ? level.getLevelExpId() : null));
             createMemberExp(member.getUserId());
         } else {
@@ -47,12 +48,26 @@ public class MemberAdminService {
     }
 
     @Transactional
-    public Member modifyMember(Long userId, UpdateMemberDto dto) {
+    public UpdateMemberDto modifyMember(Long userId, UpdateMemberDto dto) {
+        LevelExp level = findLevelExpByName(dto.level());
         Member member = memberRepository.findById(userId).orElseThrow();
-        member.updateMember(dto.name(), dto.loginId(), dto.employeeNumber(), dto.department(),
-                dto.levelId(), dto.hireDate(), dto.jobGroup());
+        member.updateMember(
+                dto.name(), dto.loginId(), dto.password(), dto.department(),
+                (level != null ? level.getLevelExpId() : null), dto.jobGroup(), dto.jobCategory()
+        );
         memberRepository.save(member);
-        return member;
+        return new UpdateMemberDto(
+                member.getName(), member.getLoginId(), member.getPassword(), member.getDepartment(),
+                getLevelName(level), member.getJobGroup(), member.getJobCategory()
+        );
+    }
+
+    private String getLevelName(LevelExp level) {
+        return level != null ? level.getName() : null;
+    }
+
+    private LevelExp findLevelExpByName(String levelName) {
+        return levelExpRepository.findLevelExpByName(levelName).orElse(null);
     }
 
     private void createMemberExp(Long userId) {

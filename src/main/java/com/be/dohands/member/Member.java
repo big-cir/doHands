@@ -64,14 +64,14 @@ public class Member extends BaseTimeEntity {
         this.jobCategory = jobCategory;
     }
 
-    public void updateMember(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup) {
+    public void updateMember(String name, String loginId, String password, String department, Long levelId, String jobGroup, String jobCategory) {
         this.name = name;
         this.loginId = loginId;
-        this.employeeNumber = employeeNumber;
+        updatePassword(password);
         this.department = department;
         this.levelId = levelId;
-        this.hireDate = hireDate;
         this.jobGroup = jobGroup;
+        this.jobCategory = jobCategory;
     }
 
     public void updatePassword(String password) {
