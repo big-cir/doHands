@@ -14,6 +14,7 @@ public class QuestStatisticsResponseDTO {
     @Builder.Default
     List<QuestInfo> questStatistics = new ArrayList<>();
 
+    @Getter
     public static class QuestInfo {
 
         private Integer month;

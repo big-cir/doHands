@@ -17,8 +17,10 @@ import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Component
 @RequiredArgsConstructor
 @Transactional
 public class GenerateQuests {
@@ -31,6 +33,7 @@ public class GenerateQuests {
     private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
 
     @Scheduled(cron="0 0 0 1 1 ?")
+    @Transactional
     public void generateAllQuestsForYear(){
         jobQuestRepository.findByYear(YEAR).forEach(this::generateJobQuestSchedule);
         leaderQuestRepository.findByYear(YEAR).forEach(this::generateLeaderQuestSchedule);

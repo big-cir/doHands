@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +45,8 @@ public class QuestController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<QuestStatisticsResponseDTO> getQuestStatistics(@AuthenticationPrincipal CustomUserDetails auth, QuestStatisticsRequestDTO request){
+    public ResponseEntity<QuestStatisticsResponseDTO> getQuestStatistics(@AuthenticationPrincipal CustomUserDetails auth,
+        @RequestBody QuestStatisticsRequestDTO request){
         QuestStatisticsResponseDTO response = questService.getQuestStatistics(auth.getUsername(), request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

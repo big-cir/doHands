@@ -1,6 +1,7 @@
 package com.be.dohands.sheet;
 
 
+import com.be.dohands.common.GenerateQuests;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.quest.data.QuestType;
@@ -12,7 +13,11 @@ import com.be.dohands.quest.entity.JobQuestExpEntity.JobQuestExpEntityBuilder;
 import com.be.dohands.quest.entity.UserQuestEntity;
 import com.be.dohands.quest.repository.JobQuestExpRepository;
 import com.be.dohands.quest.repository.JobQuestRepository;
+import com.be.dohands.quest.repository.LeaderQuestRepository;
+import com.be.dohands.quest.repository.QuestScheduleRepository;
 import com.be.dohands.quest.repository.UserQuestRepository;
+import java.time.Year;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +39,16 @@ public class JobQuestProcessor {
     private final JobQuestExpRepository jobQuestExpRepository;
     private final MemberRepository memberRepository;
     private final UserQuestRepository userQuestRepository;
+    private final QuestScheduleRepository questScheduleRepository;
+    private final LeaderQuestRepository leaderQuestRepository;
+    private final GenerateQuests generateQuests;
+
+    // 퀘스트 생성 시 연도 : 시트 미기재 속성이여서 시스템에서 직접 지정
+    private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
 
     /**
-     * 시트 읽어와서 디비 연동하는 메서드
-     * 케이스마다 payload 내부 데이터 및 연동 엔티티 개수 등이 달라 케이스별 구현
-     * appscript 기반 동작
-     *
+     * 시트 읽어와서 디비 연동하는 메서드 케이스마다 payload 내부 데이터 및 연동 엔티티 개수 등이 달라 케이스별 구현 appscript 기반 동작
+     * <p>
      * TODO: 나중에 스트림으로 처리해서 알림여부 true인것만 올리는 방안으로 리펙토링
      * @return (엔티티, 알림전송여부) 리스트
      */
@@ -90,11 +99,13 @@ public class JobQuestProcessor {
             .department(rows.get(4).toString())
             .jobGroup(rows.get(5).toString())
             .period(rows.get(6).toString())
-            .sheetRow(sheetRow);
+            .sheetRow(sheetRow)
+            .year(YEAR);
 
         jobQuestEntityOptional.ifPresent(existMember -> jobQuestEntityBuilder.jobQuestId(existMember.getJobQuestId()));
 
         JobQuestEntity jobQuestEntity = jobQuestEntityBuilder.build();
+        generateQuests.generateJobQuestSchedule(jobQuestEntity);
 
         return jobQuestRepository.save(jobQuestEntity);
 
