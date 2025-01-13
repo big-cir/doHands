@@ -2,6 +2,7 @@ package com.be.dohands.level.service;
 
 import com.be.dohands.level.LevelExp;
 import com.be.dohands.level.repository.LevelExpRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,5 +21,10 @@ public class LevelExpService {
     @Transactional(readOnly = true)
     public LevelExp findByName(String name) {
         return levelExpRepository.findLevelExpByName(name).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LevelExp> findLevelExpByCategory(String jobCategory) {
+        return levelExpRepository.findLevelExpsByJobGroupStartingWith(jobCategory);
     }
 }

@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -23,6 +24,7 @@ public class LevelExp extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long levelExpId;
 
+    @Comment("jobCategory")
     private String jobGroup;
 
     private String name;

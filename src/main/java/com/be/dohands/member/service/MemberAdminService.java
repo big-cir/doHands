@@ -69,7 +69,7 @@ public class MemberAdminService {
     }
 
     @Transactional
-    public UpdateMemberDto modifyMember(Long userId, UpdateMemberDto dto) {
+    public MemberResponse modifyMember(Long userId, UpdateMemberDto dto) {
         LevelExp level = findLevelExpByName(dto.level());
         Member member = memberRepository.findById(userId).orElseThrow();
         member.updateMember(
@@ -77,10 +77,7 @@ public class MemberAdminService {
                 (level != null ? level.getLevelExpId() : null), dto.jobGroup(), dto.jobCategory()
         );
         memberRepository.save(member);
-        return new UpdateMemberDto(
-                member.getName(), member.getLoginId(), member.getPassword(), member.getDepartment(),
-                getLevelName(level), member.getJobGroup(), member.getJobCategory()
-        );
+        return new MemberResponse(member, getLevelName(level));
     }
 
     private String getLevelName(LevelExp level) {

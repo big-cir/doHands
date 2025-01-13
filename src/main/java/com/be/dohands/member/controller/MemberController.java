@@ -50,7 +50,7 @@ public class MemberController {
     }
 
     @PatchMapping("/admin/users/{userId}")
-    public ResponseEntity<UpdateMemberDto> updateMember(@PathVariable("userId") Long userId, @RequestBody UpdateMemberDto updateMemberDto) {
+    public ResponseEntity<MemberResponse> updateMember(@PathVariable("userId") Long userId, @RequestBody UpdateMemberDto updateMemberDto) {
         return ResponseEntity.ok(memberAdminService.modifyMember(userId, updateMemberDto));
     }
 
