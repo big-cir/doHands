@@ -51,7 +51,7 @@ public class Member extends BaseTimeEntity {
 
     private Integer sheetRow;
 
-    public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup, Integer sheetRow) {
+    public Member(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup, String jobCategory) {
         this.name = name;
         this.loginId = loginId;
         this.password = "1234";
@@ -61,7 +61,7 @@ public class Member extends BaseTimeEntity {
         this.hireDate = hireDate;
         this.characterType = "default";
         this.jobGroup = jobGroup;
-        this.sheetRow = sheetRow;
+        this.jobCategory = jobCategory;
     }
 
     public void updateMember(String name, String loginId, String employeeNumber, String department, Long levelId, LocalDate hireDate, String jobGroup) {
