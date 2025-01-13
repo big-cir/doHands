@@ -22,7 +22,7 @@ public interface UserQuestRepository extends JpaRepository<UserQuestEntity, Long
 
     @Query(value = "select new com.be.dohands.quest.dto.QuestCountInfo(qs.month, qs.week , uq.questType, uq.statusType, cast(coalesce(count(uq.userQuestId),0) as int)) "
         + "from UserQuestEntity uq "
-        + "join QuestScheduleEntity qs "
+        + "left join QuestScheduleEntity qs on uq.questScheduleId = qs.questScheduleId "
         + "where uq.userId = :userId and uq.questType = :questType and qs.month = :month "
         + "group by qs.month, qs.week, uq.questType, uq.statusType "
         + "order by uq.statusType ")
@@ -30,7 +30,7 @@ public interface UserQuestRepository extends JpaRepository<UserQuestEntity, Long
 
     @Query(value = "select new com.be.dohands.quest.dto.QuestCountInfo(qs.month, qs.week , uq.questType, uq.statusType, cast(coalesce(count(uq.userQuestId),0) as int)) "
         + "from UserQuestEntity uq "
-        + "join QuestScheduleEntity qs "
+        + "left join QuestScheduleEntity qs on uq.questScheduleId = qs.questScheduleId "
         + "where uq.userId = :userId and uq.questType = :questType and qs.week = :week "
         + "group by qs.month, qs.week, uq.questType, uq.statusType "
         + "order by uq.statusType ")
