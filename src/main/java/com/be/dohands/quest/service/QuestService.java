@@ -87,7 +87,7 @@ public class QuestService {
         }).toList();
 
         return QuestListResponseDTO.builder()
-            .leaderQuestDetailList(quests)
+            .items(quests)
             .build();
     }
 
