@@ -22,4 +22,14 @@ public interface QuestScheduleRepository extends JpaRepository<QuestScheduleEnti
         + "where qs.department = : department and qs.year = :year and qs.month = :month ")
     List<QuestScheduleEntity> findByDepartmentAndWeek(@Param("department") String department,
         @Param("year") Integer year, @Param("week") Integer week);
+
+    @Query(value = "select qs "
+        + "from QuestScheduleEntity qs "
+        + "where qs.year = :year and qs.month = :month")
+    List<QuestScheduleEntity> findByYearAndMonth(@Param("year") Integer year, @Param("month") Integer month);
+
+    @Query(value = "select qs "
+        + "from QuestScheduleEntity qs "
+        + "where qs.year = :year and qs.week = :week")
+    List<QuestScheduleEntity> findByYearAndWeek(@Param("year") Integer year, @Param("week") Integer week);
 }

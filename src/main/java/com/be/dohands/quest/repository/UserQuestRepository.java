@@ -39,4 +39,6 @@ public interface UserQuestRepository extends JpaRepository<UserQuestEntity, Long
     @Query(value = "select uq from UserQuestEntity uq "
         + "where uq.questScheduleId = :questScheduleId and uq.userId = :userId")
     UserQuestEntity findByQuestScheduleIdAndUserId(@Param("questScheduleId") Long questScheduleId, @Param("userId") Long userId);
+
+    List<UserQuestEntity> findByQuestScheduleId(Long questScheduleId);
 }
