@@ -4,6 +4,7 @@ import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.dto.CreateMemberDto;
 import com.be.dohands.member.dto.MemberExpStatusDto;
+import com.be.dohands.member.dto.MemberResponse;
 import com.be.dohands.member.dto.MemberSlice;
 import com.be.dohands.member.dto.MultiCursorResult;
 import com.be.dohands.member.dto.QuestExpConditionDto;
@@ -43,8 +44,8 @@ public class MemberController {
     }
 
     @GetMapping("/admin/users")
-    public ResponseEntity<MemberSlice> getMembers(@RequestParam String next, @RequestParam int size,
-                                                  @RequestParam(required = false) String name) {
+    public ResponseEntity<MemberSlice<MemberResponse>> getMembers(@RequestParam String next, @RequestParam int size,
+                                                                  @RequestParam(required = false) String name) {
         return ResponseEntity.ok(memberAdminService.findMembers(name, next, size));
     }
 

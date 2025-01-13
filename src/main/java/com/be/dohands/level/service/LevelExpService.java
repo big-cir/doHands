@@ -14,6 +14,11 @@ public class LevelExpService {
 
     @Transactional
     public LevelExp findLevelExp(Long levelExpId) {
-        return levelExpRepository.findById(levelExpId).orElseThrow();
+        return levelExpRepository.findById(levelExpId).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public LevelExp findByName(String name) {
+        return levelExpRepository.findLevelExpByName(name).orElse(null);
     }
 }

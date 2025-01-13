@@ -1,10 +1,11 @@
 package com.be.dohands.member.service;
 
 import com.be.dohands.level.LevelExp;
-import com.be.dohands.level.repository.LevelExpRepository;
+import com.be.dohands.level.service.LevelExpService;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.dto.CreateMemberDto;
+import com.be.dohands.member.dto.MemberResponse;
 import com.be.dohands.member.dto.MemberSlice;
 import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.repository.MemberExpRepository;
@@ -12,7 +13,6 @@ import com.be.dohands.member.repository.MemberQueryRepository;
 import com.be.dohands.member.repository.MemberRepository;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.sql.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +23,7 @@ public class MemberAdminService {
     private final MemberRepository memberRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final MemberExpRepository memberExpRepository;
-    private final LevelExpRepository levelExpRepository;
+    private final LevelExpService levelExpService;
 
     @Transactional
     public void saveMember(CreateMemberDto dto) {
@@ -37,13 +37,34 @@ public class MemberAdminService {
     }
 
     @Transactional(readOnly = true)
-    public MemberSlice findMembers(String name, String next, int size) {
+    public MemberSlice<MemberResponse> findMembers(String name, String next, int size) {
         if (next.isEmpty()) next = null;
         Long nextId = next == null ? null : Long.parseLong(next);
         if (name != null && !name.isEmpty()) {
-            return memberQueryRepository.findMembersByName(name, nextId, size);
+            MemberSlice<Member> slice = memberQueryRepository.findMembersByName(name, nextId, size);
+            return new MemberSlice<>(
+                    slice.getMembers()
+                            .stream()
+                            .map(m -> {
+                                LevelExp level = levelExpService.findLevelExp(m.getLevelId());
+                                return new MemberResponse(m, getLevelName(level));
+                            })
+                            .toList(),
+                    slice.getNext(),
+                    slice.isHasNext());
         } else {
-            return memberQueryRepository.findAllMembers(nextId, size);
+            MemberSlice<Member> slice = memberQueryRepository.findAllMembers(nextId, size);
+            return new MemberSlice<>(
+                    slice.getMembers()
+                            .stream()
+                            .map(m -> {
+                                Long levelId = m.getLevelId();
+                                LevelExp level = (levelId != null) ? levelExpService.findLevelExp(levelId) : null;
+                                return new MemberResponse(m, getLevelName(level));
+                            })
+                            .toList(),
+                    slice.getNext(),
+                    slice.isHasNext());
         }
     }
 
@@ -67,7 +88,7 @@ public class MemberAdminService {
     }
 
     private LevelExp findLevelExpByName(String levelName) {
-        return levelExpRepository.findLevelExpByName(levelName).orElse(null);
+        return levelExpService.findByName(levelName);
     }
 
     private void createMemberExp(Long userId) {
