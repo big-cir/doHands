@@ -31,6 +31,7 @@ public class GenerateQuests {
     private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
 
     @Scheduled(cron="0 0 0 1 1 ?")
+    @Transactional
     public void generateAllQuestsForYear(){
         jobQuestRepository.findByYear(YEAR).forEach(this::generateJobQuestSchedule);
         leaderQuestRepository.findByYear(YEAR).forEach(this::generateLeaderQuestSchedule);
