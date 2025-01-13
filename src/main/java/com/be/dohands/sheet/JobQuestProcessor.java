@@ -41,9 +41,7 @@ public class JobQuestProcessor {
     private final UserQuestRepository userQuestRepository;
     private final QuestScheduleRepository questScheduleRepository;
     private final LeaderQuestRepository leaderQuestRepository;
-
-    private GenerateQuests generateQuests = new GenerateQuests(memberRepository,
-        userQuestRepository, questScheduleRepository, jobQuestRepository, leaderQuestRepository);
+    private final GenerateQuests generateQuests;
 
     // 퀘스트 생성 시 연도 : 시트 미기재 속성이여서 시스템에서 직접 지정
     private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
@@ -52,7 +50,6 @@ public class JobQuestProcessor {
      * 시트 읽어와서 디비 연동하는 메서드 케이스마다 payload 내부 데이터 및 연동 엔티티 개수 등이 달라 케이스별 구현 appscript 기반 동작
      * <p>
      * TODO: 나중에 스트림으로 처리해서 알림여부 true인것만 올리는 방안으로 리펙토링
-     *
      * @return (엔티티, 알림전송여부) 리스트
      */
     public List<TransformResult<?>> readDividedSheetAndUpdateDb(Map<String, Object> payload) {
@@ -70,21 +67,16 @@ public class JobQuestProcessor {
 
         //jobQuestEntity 작업 - 엔티티 하나만 생성됨
         Map<String, Object> data1Row = data1.get(0);
-        int rowNumber1 = (int) data1Row.get(
-            "rowNumber");                             // rowNumber 가져오기
-        List<Object> rowData1 = (List<Object>) data1Row.get(
-            "rowData");               // rowData 가져오기
+        int rowNumber1 = (int) data1Row.get("rowNumber");                             // rowNumber 가져오기
+        List<Object> rowData1 = (List<Object>) data1Row.get("rowData");               // rowData 가져오기
         JobQuestEntity jobQuestEntity = makeJobQuestEntity(rowData1, rowNumber1);      // 변환
 
         // jobQuestExpEntity 작업
         if (data2 != null) {
             for (Map<String, Object> row : data2) {
-                int rowNumber = (int) row.get(
-                    "rowNumber");                             // rowNumber 가져오기
-                List<Object> rowData = (List<Object>) row.get(
-                    "rowData");               // rowData 가져오기
-                TransformResult transformResult = makeJobQuestExpTransformResult(rowData, rowNumber,
-                    jobQuestEntity);   // 변환
+                int rowNumber = (int) row.get("rowNumber");                             // rowNumber 가져오기
+                List<Object> rowData = (List<Object>) row.get("rowData");               // rowData 가져오기
+                TransformResult transformResult = makeJobQuestExpTransformResult(rowData,rowNumber,jobQuestEntity);   // 변환
                 results.add(transformResult);
             }
         }
@@ -94,14 +86,12 @@ public class JobQuestProcessor {
 
     /**
      * JobQuestEntity 생성 메서드
-     *
      * @param : 스프레드 시트에서 받은 데이터
      * @return : JobQuestEntity
      */
     private JobQuestEntity makeJobQuestEntity(List rows, Integer sheetRow) {
 
-        Optional<JobQuestEntity> jobQuestEntityOptional = jobQuestRepository.findBySheetRow(
-            sheetRow);
+        Optional<JobQuestEntity> jobQuestEntityOptional = jobQuestRepository.findBySheetRow(sheetRow);
 
         JobQuestEntityBuilder jobQuestEntityBuilder = JobQuestEntity.builder()
             .maxExp(TypeConversionUtil.toInteger(rows.get(0).toString()))
@@ -112,8 +102,7 @@ public class JobQuestProcessor {
             .sheetRow(sheetRow)
             .year(YEAR);
 
-        jobQuestEntityOptional.ifPresent(
-            existMember -> jobQuestEntityBuilder.jobQuestId(existMember.getJobQuestId()));
+        jobQuestEntityOptional.ifPresent(existMember -> jobQuestEntityBuilder.jobQuestId(existMember.getJobQuestId()));
 
         JobQuestEntity jobQuestEntity = jobQuestEntityBuilder.build();
         generateQuests.generateJobQuestSchedule(jobQuestEntity);
@@ -124,15 +113,12 @@ public class JobQuestProcessor {
 
     /**
      * JobQuestExpEntity 생성 및 알림 전송 여부 반환 메서드
-     *
      * @param : 스프레드 시트 데이터 & 해당하는 JobQuestEntity
      * @return JobQuestExpEntity & 알림 전송 여부
      */
-    public TransformResult<JobQuestExpEntity> makeJobQuestExpTransformResult(List rows,
-        Integer sheetRow, JobQuestEntity jobQuestEntity) {
+    public TransformResult<JobQuestExpEntity> makeJobQuestExpTransformResult(List rows, Integer sheetRow, JobQuestEntity jobQuestEntity) {
 
-        Optional<JobQuestExpEntity> jobQuestExpEntityOptional = jobQuestExpRepository.findBySheetRow(
-            sheetRow);
+        Optional<JobQuestExpEntity> jobQuestExpEntityOptional = jobQuestExpRepository.findBySheetRow(sheetRow);
 
         JobQuestExpEntity entity = makeJobQuestExpEntityBySheet(rows, sheetRow, jobQuestEntity,
             jobQuestExpEntityOptional);
@@ -150,11 +136,10 @@ public class JobQuestProcessor {
     }
 
     /**
-     * JobQuestExpEntity 생성 시, JobQuestEntity (department, jobGroup)에 맞는 모든 member UserQuestEntity
-     * 생성 메서드
+     * JobQuestExpEntity 생성 시,
+     * JobQuestEntity (department, jobGroup)에 맞는 모든 member UserQuestEntity 생성 메서드
      */
-    private void makeUserQuestEntity(JobQuestEntity jobQuestEntity,
-        JobQuestExpEntity savedJobQuestExp) {
+    private void makeUserQuestEntity(JobQuestEntity jobQuestEntity, JobQuestExpEntity savedJobQuestExp) {
         List<Member> memberList = memberRepository.findMembersByDepartmentAndJobGroup(
             jobQuestEntity.getDepartment(), jobQuestEntity.getJobGroup());
 
@@ -176,11 +161,9 @@ public class JobQuestProcessor {
 
     /**
      * 스프레드 시트 데이터로 JobQuestExpEntity 생성 or 수정 메서드
-     *
      * @return : JobQuestExpEntity
      */
-    private JobQuestExpEntity makeJobQuestExpEntityBySheet(List rows, Integer sheetRow,
-        JobQuestEntity jobQuestEntity, Optional<JobQuestExpEntity> jobQuestExpEntityOptional) {
+    private JobQuestExpEntity makeJobQuestExpEntityBySheet(List rows, Integer sheetRow, JobQuestEntity jobQuestEntity, Optional<JobQuestExpEntity> jobQuestExpEntityOptional) {
         Integer givenExp = TypeConversionUtil.toInteger(rows.get(1).toString());
         JobQuestExpEntityBuilder jobQuestExpEntityBuilder = JobQuestExpEntity.builder()
             .exp(givenExp)
@@ -194,8 +177,7 @@ public class JobQuestProcessor {
             .jobQuestId(jobQuestEntity.getJobQuestId())
             .sheetRow(sheetRow);
 
-        jobQuestExpEntityOptional.ifPresent(
-            existMember -> jobQuestExpEntityBuilder.jobQuestExpId(existMember.getJobQuestExpId()));
+        jobQuestExpEntityOptional.ifPresent(existMember -> jobQuestExpEntityBuilder.jobQuestExpId(existMember.getJobQuestExpId()));
 
         return jobQuestExpEntityBuilder.build();
     }
@@ -233,11 +215,9 @@ public class JobQuestProcessor {
 //    }
 
 
-    private boolean isNotificationYn(Optional<JobQuestExpEntity> jobQuestExpEntityOptional,
-        Integer givenExp) {
+    private boolean isNotificationYn(Optional<JobQuestExpEntity> jobQuestExpEntityOptional, Integer givenExp) {
         boolean notificationYn = jobQuestExpEntityOptional.isEmpty() && givenExp != null;
-        if (jobQuestExpEntityOptional.isPresent() && !Objects.equals(
-            jobQuestExpEntityOptional.get().getExp(), givenExp)) {
+        if (jobQuestExpEntityOptional.isPresent() && !Objects.equals(jobQuestExpEntityOptional.get().getExp(), givenExp)) {
             notificationYn = true;
         }
         return notificationYn;
