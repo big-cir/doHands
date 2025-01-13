@@ -85,4 +85,8 @@ public class Member extends BaseTimeEntity {
             this.characterType = characterType;
         }
     }
+
+    public void updateSheetRow(Integer sheetRow) {
+        this.sheetRow = sheetRow;
+    }
 }

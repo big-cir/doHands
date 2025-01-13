@@ -1,7 +1,9 @@
 package com.be.dohands.sheet;
 
+import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ public class SpreadSheetService {
     private final LevelExpProcessor levelExpProcessor;
 
     private final MemberRepository memberRepository;
-
+    private final LevelExpRepository levelExpRepository;
 
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
@@ -65,6 +67,29 @@ public class SpreadSheetService {
         values.add(Collections.singletonList(password));
 
         memberProcessor.updateValues(spreadsheetId, sheetLocation, "RAW", values);
+    }
+
+    /**
+     * admin에서 등록한 계정 정보 시트에 자동 추가하는 메서드
+     */
+    public void createMemberInfoToSheet(String spreadsheetId, Member member)
+        throws GeneralSecurityException, IOException {
+
+        String sheetName = "참고. 구성원 정보";
+        String sheetLocation = sheetName + "!J:J";
+
+        List<List<Object>> values = new ArrayList<>();
+        String levelName = levelExpRepository.findById(member.getLevelId())
+            .map(levelExp -> levelExp.getName())
+            .orElseThrow(() -> new NoSuchElementException("존재하지않는 레벨ID"));
+
+        values.add(List.of(member.getEmployeeNumber(), member.getName(),DateUtil.localDateToString(member.getHireDate()), member.getDepartment(), member.getJobGroup(), levelName, member.getLoginId(), member.getPassword()));
+
+        AppendValuesResponse response = memberProcessor.appendValues(spreadsheetId, sheetLocation, "RAW", values);
+        // 스프레드시트에 저장된 행 가져와서 member sheetRow 업데이트
+        Integer sheetRow = Integer.parseInt(response.getUpdates().getUpdatedRange().replaceAll(".*?(\\d+).*", "$1"));
+        member.updateSheetRow(sheetRow);
+        memberRepository.save(member);
     }
 
 }

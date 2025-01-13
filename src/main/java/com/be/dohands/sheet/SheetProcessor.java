@@ -14,6 +14,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.FileNotFoundException;
@@ -66,8 +67,8 @@ public abstract class SheetProcessor<T> {
      */
     @Deprecated
     public void readSheet(String spreadsheetId,String sheetName,String sheetRange, Integer startSheetRow) throws GeneralSecurityException, IOException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        final String range = sheetName + sheetRange;
+        NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        String range = sheetName + sheetRange;
 
         Sheets service =
             new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -123,7 +124,8 @@ public abstract class SheetProcessor<T> {
         String valueInputOption,
         List<List<Object>> values)
         throws IOException, GeneralSecurityException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+        NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
 
         Sheets service =
             new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -150,4 +152,42 @@ public abstract class SheetProcessor<T> {
 
         return result;
     }
+
+    /**
+     * 시트에 행 자동 추가하는 메서드(앱에서 생성 -> 시트 자동 반영)
+     * credential.json 없어서 현재 사용 불가
+     */
+    public AppendValuesResponse appendValues(String spreadsheetId,
+        String range,
+        String valueInputOption,
+        List<List<Object>> values)
+        throws IOException, GeneralSecurityException {
+
+        NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+
+        Sheets service =
+            new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        AppendValuesResponse result = null;
+        try {
+            ValueRange body = new ValueRange()
+                .setValues(values);
+            result = service.spreadsheets().values().append(spreadsheetId, range, body)
+                .setValueInputOption(valueInputOption)
+                .execute();
+            log.info("cells appended : " + result.getUpdates().getUpdatedCells());
+        } catch (GoogleJsonResponseException e) {
+            GoogleJsonError error = e.getDetails();
+            if (error.getCode() == 404) {
+                log.info("Spreadsheet not found with id : ", spreadsheetId);
+            } else {
+                throw e;
+            }
+        }
+        return result;
+    }
+
+
 }
