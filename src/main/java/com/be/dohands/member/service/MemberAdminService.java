@@ -1,5 +1,7 @@
 package com.be.dohands.member.service;
 
+import com.be.dohands.level.LevelExp;
+import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.dto.CreateMemberDto;
@@ -20,11 +22,13 @@ public class MemberAdminService {
     private final MemberRepository memberRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final MemberExpRepository memberExpRepository;
+    private final LevelExpRepository levelExpRepository;
 
     @Transactional
     public void saveMember(CreateMemberDto dto) {
         if (!memberRepository.existsByLoginId(dto.loginId())) {
-            Member member = memberRepository.save(dto.toMember());
+            LevelExp level = levelExpRepository.findLevelExpByName(dto.level()).get();
+            Member member = memberRepository.save(dto.toMember(level.getLevelExpId()));
             createMemberExp(member.getUserId());
         } else {
             throw new RuntimeException("중복된 사용자 ID");
