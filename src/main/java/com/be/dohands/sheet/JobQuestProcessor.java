@@ -1,7 +1,7 @@
 package com.be.dohands.sheet;
 
 
-import com.be.dohands.common.GenerateQuests;
+import com.be.dohands.common.schedules.GenerateQuests;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.quest.data.QuestType;

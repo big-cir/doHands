@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
@@ -37,6 +38,7 @@ public class UserQuestEntity {
 
     private Long questScheduleId;
 
+    @Setter
     @Enumerated(value = EnumType.STRING)
     private StatusType statusType;
 
