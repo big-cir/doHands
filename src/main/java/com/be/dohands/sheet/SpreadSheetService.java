@@ -6,6 +6,7 @@ import com.be.dohands.member.repository.MemberRepository;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -91,5 +92,45 @@ public class SpreadSheetService {
         member.updateSheetRow(sheetRow);
         memberRepository.save(member);
     }
+
+    /**
+     * admin에서 등록한 계정 정보 시트에 자동 추가하는 메서드 for test
+     */
+    @Deprecated
+    public void createMemberInfoToSheetForTest(String spreadsheetId)
+        throws GeneralSecurityException, IOException {
+
+        Member member = Member.builder()
+            .loginId("김테스_두핸즈")
+            .password("1111")
+            .employeeNumber("2024011588")
+            .department("음성 1센터")
+            .name("김테스")
+            .levelId(5L)
+            .hireDate(LocalDate.of(2024, 1, 15))
+            .jobGroup("2")
+            .jobCategory("관리직")
+            .build();
+
+        memberRepository.save(member);
+
+        String sheetName = "참고. 구성원 정보";
+        String sheetLocation = sheetName + "!J:J";
+
+        List<List<Object>> values = new ArrayList<>();
+        String levelName = levelExpRepository.findById(member.getLevelId())
+            .map(levelExp -> levelExp.getName())
+            .orElseThrow(() -> new NoSuchElementException("존재하지않는 레벨ID"));
+
+        values.add(List.of(member.getEmployeeNumber(), member.getName(),DateUtil.localDateToString(member.getHireDate()), member.getDepartment(), member.getJobGroup(), levelName, member.getLoginId(), member.getPassword()));
+
+        AppendValuesResponse response = memberProcessor.appendValues(spreadsheetId, sheetLocation, "RAW", values);
+        // 스프레드시트에 저장된 행 가져와서 member sheetRow 업데이트
+        Integer sheetRow = Integer.parseInt(response.getUpdates().getUpdatedRange().replaceAll(".*?(\\d+).*", "$1"));
+        member.updateSheetRow(sheetRow);
+        memberRepository.save(member);
+    }
+
+
 
 }
