@@ -1,4 +1,4 @@
-package com.be.dohands.common;
+package com.be.dohands.common.schedules;
 
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
@@ -41,12 +41,12 @@ public class GenerateQuests {
 
     public void generateJobQuestSchedule(JobQuestEntity jobQuest){
         if (jobQuest.getPeriod().equals("주")) generateWeeklyJobQuests(jobQuest);
-        generateMonthlyJobQuests(jobQuest);
+        else generateMonthlyJobQuests(jobQuest);
     }
 
     public void generateLeaderQuestSchedule(LeaderQuestEntity leaderQuest){
         if (leaderQuest.getPeriod().equals("주")) generateWeeklyLeaderQuests(leaderQuest);
-        generateMonthlyLeaderQuests(leaderQuest);
+        else generateMonthlyLeaderQuests(leaderQuest);
     }
     public void generateMonthlyJobQuests(JobQuestEntity jobQuest){
         for(int month = 1; month <= 12; month++){
@@ -110,6 +110,7 @@ public class GenerateQuests {
         departmentMembers.stream().map(member -> UserQuestEntity.builder()
             .questType(questType)
             .questId(questId)
+            .questExpId(null)
             .userId(member.getUserId())
             .questScheduleId(questSchedule.getQuestScheduleId())
             .statusType(StatusType.NOT_STARTED)
