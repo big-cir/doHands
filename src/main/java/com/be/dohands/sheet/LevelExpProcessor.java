@@ -18,7 +18,7 @@ public class LevelExpProcessor{
 
     private final LevelExpRepository levelExpRepository;
 
-    private static final List<String> jobGroupList = List.of("F", "B", "G", "T");
+    private static final List<String> jobGroupList = List.of("현장", "관리", "성장전략", "기술");
 
 
     /**
