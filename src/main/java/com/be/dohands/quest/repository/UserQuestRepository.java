@@ -1,7 +1,6 @@
 package com.be.dohands.quest.repository;
 
 import com.be.dohands.quest.data.QuestType;
-//import com.be.dohands.quest.dto.QuestCounts.Info;
 import com.be.dohands.quest.dto.QuestCountInfo;
 import com.be.dohands.quest.entity.UserQuestEntity;
 import java.util.List;
@@ -37,5 +36,7 @@ public interface UserQuestRepository extends JpaRepository<UserQuestEntity, Long
         + "order by uq.statusType ")
     List<QuestCountInfo> totalQuestsByQuestTypeAndWeek (@Param("userId") Long userId, @Param("questType") QuestType questType, @Param("week") Integer week);
 
-
+    @Query(value = "select uq from UserQuestEntity uq "
+        + "where uq.questScheduleId = :questScheduleId and uq.userId = :userId")
+    UserQuestEntity findByQuestScheduleIdAndUserId(@Param("questScheduleId") Long questScheduleId, @Param("userId") Long userId);
 }
