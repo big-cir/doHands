@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,14 +24,25 @@ public class DateUtil {
 
         if (object instanceof String stringDate) {
             try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-                return LocalDate.parse(stringDate, formatter);
+                List<DateTimeFormatter> formatters = List.of(
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                );
+
+                for (DateTimeFormatter formatter : formatters) {
+                    try {
+                        return LocalDate.parse(stringDate, formatter);
+                    } catch (DateTimeParseException e) {
+                        // 다음 포매팅 시도
+                    }
+                }
+
             } catch (DateTimeParseException e) {
                 log.info("LocalDate로 변환 실패 : " + stringDate);
             }
         }
 
-        throw new IllegalArgumentException("잘못된 인스턴스 타입입니다");
+        throw new IllegalArgumentException("잘못된 인스턴스 타입입니다 : " + object.getClass().getName());
     }
 
     public static LocalDateTime toLocalDateTime(Object object) {

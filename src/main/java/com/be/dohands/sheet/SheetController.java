@@ -1,5 +1,7 @@
 package com.be.dohands.sheet;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SheetController {
 
     private final SpreadSheetService sheetService;
-
+    private final String spreadsheetId = "1F1G8ZGAh-_31NEZoj8tcnDVzT0RbmjnwCN4G_jtemas";
     @GetMapping("/test/success")
     public String testSuccess() {
         return "success";
@@ -62,4 +64,8 @@ public class SheetController {
         return ResponseEntity.ok("Webhook received successfully");
     }
 
+    @PostMapping("/test/change")
+    public void changeSheet() throws GeneralSecurityException, IOException {
+        sheetService.createMemberInfoToSheetForTest(spreadsheetId);
+    }
 }
