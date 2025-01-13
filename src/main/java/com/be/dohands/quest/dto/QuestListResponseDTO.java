@@ -14,7 +14,7 @@ import lombok.Getter;
 public class QuestListResponseDTO {
 
     @Builder.Default
-    List<Quest> leaderQuestDetailList = new ArrayList<>();
+    List<Quest> items = new ArrayList<>();
 
     @Builder
     @Getter
