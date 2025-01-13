@@ -4,6 +4,8 @@ import static com.be.dohands.member.dto.QuestResult.processQuestType;
 
 import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
+import com.be.dohands.level.LevelExp;
+import com.be.dohands.level.service.LevelExpService;
 import com.be.dohands.member.dto.QuestsInProgressRequestDTO;
 import com.be.dohands.member.dto.QuestsInProgressResponseDTO;
 import com.be.dohands.member.dto.QuestsInProgressResponseDTO.QuestInProgress;
@@ -52,6 +54,7 @@ public class MemberService {
     private final LeaderQuestRepository leaderQuestRepository;
 
     private final JobQuestService jobQuestService;
+    private final LevelExpService levelExpService;
 
     private static final String[] questType = {"evaluation", "leader", "tf", "job"};
 
@@ -71,7 +74,10 @@ public class MemberService {
     public MemberExpStatusDto findMemberExpById(String loginId) {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         MemberExp memberExp = memberExpRepository.findByUserId(member.getUserId()).orElseThrow();
-        return new MemberExpStatusDto(memberExp.getCurrentExp(), memberExp.getCumulativeExp());
+        LevelExp level = levelExpService.findNextExpByCategory(member.getJobCategory(),
+                memberExp.getCurrentExp());
+        return new MemberExpStatusDto(memberExp.getCurrentExp(), memberExp.getCumulativeExp(),
+                level == null ? 0 : level.getExp());
     }
 
     @Transactional

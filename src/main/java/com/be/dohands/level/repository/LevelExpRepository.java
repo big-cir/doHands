@@ -12,4 +12,6 @@ public interface LevelExpRepository extends JpaRepository<LevelExp, Long> {
     Optional<LevelExp> findByNameAndExpAndJobGroup(String name, Integer exp, String jobGroup);
 
     List<LevelExp> findLevelExpsByJobGroupStartingWith(String jobCategory);
+
+    Optional<LevelExp> findFirstByJobGroupStartingWithAndExpGreaterThan(String jobCategory, Integer exp);
 }

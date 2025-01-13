@@ -1,4 +1,4 @@
 package com.be.dohands.member.dto;
 
-public record MemberExpStatusDto(int currentExp, int cumulativeExp) {
+public record MemberExpStatusDto(int currentExp, int cumulativeExp, int nextLevelExp) {
 }

@@ -27,4 +27,9 @@ public class LevelExpService {
     public List<LevelExp> findLevelExpByCategory(String jobCategory) {
         return levelExpRepository.findLevelExpsByJobGroupStartingWith(jobCategory);
     }
+
+    @Transactional
+    public LevelExp findNextExpByCategory(String jobCategory, int exp) {
+        return levelExpRepository.findFirstByJobGroupStartingWithAndExpGreaterThan(jobCategory, exp).orElse(null);
+    }
 }
