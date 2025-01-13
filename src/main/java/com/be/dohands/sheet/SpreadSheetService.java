@@ -2,6 +2,8 @@ package com.be.dohands.sheet;
 
 import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
+import com.be.dohands.member.MemberExp;
+import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
@@ -29,10 +31,18 @@ public class SpreadSheetService {
 
     private final MemberRepository memberRepository;
     private final LevelExpRepository levelExpRepository;
+    private final MemberExpRepository memberExpRepository;
 
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
-        memberProcessor.readSheetAndUpdateDb(payload);
+        List<TransformResult<Member>> transformResults = memberProcessor.readSheetAndUpdateDb(payload);
+        transformResults.stream()
+                .map(TransformResult::getEntity)
+                .forEach(m -> {
+                    int year = LocalDate.now().getYear();
+                    memberExpRepository.findByUserId(m.getUserId())
+                            .orElseGet(() -> memberExpRepository.save(new MemberExp(year, m.getUserId())));
+                });
     }
 
     public void readAndUpdateArticleSheet(Map<String, Object> payload) {
