@@ -20,7 +20,7 @@ class SpreadSheetServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private String spreadsheetId = "1F1G8ZGAh-_31NEZoj8tcnDVzT0RbmjnwCN4G_jtemas";
+    private String spreadsheetId = "1nEA36Rft_qqzLjRaojQC1hCwxGuhBQz_ABoi5jRXdOk";
     private String sheetName = "참고. 구성원 정보";
 
     @Test

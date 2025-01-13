@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SheetController {
 
     private final SpreadSheetService sheetService;
-    private final String spreadsheetId = "1F1G8ZGAh-_31NEZoj8tcnDVzT0RbmjnwCN4G_jtemas";
+    private final String spreadsheetId = "1nEA36Rft_qqzLjRaojQC1hCwxGuhBQz_ABoi5jRXdOk";
     @GetMapping("/test/success")
     public String testSuccess() {
         return "success";
