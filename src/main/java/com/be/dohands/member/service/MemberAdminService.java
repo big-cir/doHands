@@ -27,8 +27,8 @@ public class MemberAdminService {
     @Transactional
     public void saveMember(CreateMemberDto dto) {
         if (!memberRepository.existsByLoginId(dto.loginId())) {
-            LevelExp level = levelExpRepository.findLevelExpByName(dto.level()).get();
-            Member member = memberRepository.save(dto.toMember(level.getLevelExpId()));
+            LevelExp level = levelExpRepository.findLevelExpByName(dto.level()).orElse(null);
+            Member member = memberRepository.save(dto.toMember(level != null ? level.getLevelExpId() : null));
             createMemberExp(member.getUserId());
         } else {
             throw new RuntimeException("중복된 사용자 ID");
