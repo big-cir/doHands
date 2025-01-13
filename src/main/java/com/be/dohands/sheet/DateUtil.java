@@ -53,4 +53,8 @@ public class DateUtil {
 
         throw new IllegalArgumentException("잘못된 인스턴스 타입입니다");
     }
+
+    public static String localDateToString(LocalDate localDate) {
+        return localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 }
