@@ -36,4 +36,6 @@ public class LeaderQuestEntity extends BaseTimeEntity {
     private String medianStandard;
 
     private String notes;
+
+    private Integer year;
 }
