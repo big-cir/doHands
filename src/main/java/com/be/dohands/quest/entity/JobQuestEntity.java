@@ -32,4 +32,6 @@ public class JobQuestEntity extends BaseTimeEntity {
     private String period;
 
     private Integer sheetRow;
+
+    private Integer year;
 }

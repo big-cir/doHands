@@ -12,4 +12,6 @@ public interface JobQuestRepository extends JpaRepository<JobQuestEntity, Long> 
     Optional<JobQuestEntity> findByJobQuestId(Long questId);
 
     Optional<JobQuestEntity> findBySheetRow(Integer sheetRow);
+
+    List<JobQuestEntity> findByYear(Integer year);
 }
