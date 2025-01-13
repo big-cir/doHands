@@ -24,6 +24,8 @@ public class QuestScheduleEntity extends BaseTimeEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long questScheduleId;
 
+    private Integer year;
+
     private Integer month;
 
     private Integer week;

@@ -2,9 +2,19 @@ package com.be.dohands.member.service;
 
 import static com.be.dohands.member.dto.QuestResult.processQuestType;
 
+import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
+import com.be.dohands.member.dto.QuestsInProgressRequestDTO;
+import com.be.dohands.member.dto.QuestsInProgressResponseDTO;
+import com.be.dohands.member.dto.QuestsInProgressResponseDTO.QuestInProgress;
 import com.be.dohands.member.dto.UpdateCharacterDto;
+import com.be.dohands.quest.data.QuestType;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
+import com.be.dohands.quest.entity.QuestScheduleEntity;
+import com.be.dohands.quest.entity.UserQuestEntity;
+import com.be.dohands.quest.repository.LeaderQuestRepository;
+import com.be.dohands.quest.repository.QuestScheduleRepository;
+import com.be.dohands.quest.repository.UserQuestRepository;
 import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.quest.repository.LeaderQuestExpQueryRepository;
 import com.be.dohands.member.Member;
@@ -37,6 +47,9 @@ public class MemberService {
     private final EvaluationExpQueryRepository evaluationExpQueryRepository;
     private final LeaderQuestExpQueryRepository leaderQuestExpQueryRepository;
     private final TfExpQueryRepository tfExpQueryRepository;
+    private final UserQuestRepository userQuestRepository;
+    private final QuestScheduleRepository questScheduleRepository;
+    private final LeaderQuestRepository leaderQuestRepository;
 
     private final JobQuestService jobQuestService;
 
@@ -78,6 +91,39 @@ public class MemberService {
     @Transactional(readOnly = true)
     public Member findMember(String loginId) {
         return memberRepository.findByLoginId(loginId).get();
+    }
+
+
+    @Transactional(readOnly = true)
+    public QuestsInProgressResponseDTO getQuestsInProgress(CustomUserDetails user, QuestsInProgressRequestDTO request) {
+        List<QuestInProgress> result = new ArrayList<>();
+
+        Long userId = memberRepository.findByLoginId(user.getUsername()).get().getUserId();
+
+        List<QuestScheduleEntity> questMonthSchedules = questScheduleRepository.findByDepartmentAndMonth(request.getDepartment(),
+            request.getYear(), request.getMonth());
+
+        findQuestsInProgress(result, questMonthSchedules, userId);
+
+        List<QuestScheduleEntity> questWeekSchedules = questScheduleRepository.findByDepartmentAndWeek(request.getDepartment(),
+            request.getYear(), request.getWeek());
+
+        findQuestsInProgress(result, questWeekSchedules, userId);
+
+        return QuestsInProgressResponseDTO.builder()
+            .questsInProgressList(result)
+            .build();
+    }
+
+    private void findQuestsInProgress(List<QuestInProgress> questsInProgressList,
+        List<QuestScheduleEntity> questWeekSchedules, Long userId) {
+        for (QuestScheduleEntity q : questWeekSchedules) {
+            UserQuestEntity userQuest = userQuestRepository.findByQuestScheduleIdAndUserId(q.getQuestScheduleId(), userId);
+            String questName = null;
+            if (userQuest.getQuestType() == QuestType.LEADER) questName = leaderQuestRepository.findByLeaderQuestId(userQuest.getQuestId()).get().getQuestName();
+            QuestInProgress questInProgress = new QuestInProgress(questName, userQuest.getQuestType(), userQuest.getStatusType());
+            questsInProgressList.add(questInProgress);
+        }
     }
 
     private MultiCursorResult<QuestExpDto> findQuestExpWithoutJobQuestByEmployeeNumber(String employeeNumber, String department, MultiCursor multiCursor, int size) {

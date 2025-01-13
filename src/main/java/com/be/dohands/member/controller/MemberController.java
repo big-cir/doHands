@@ -8,6 +8,8 @@ import com.be.dohands.member.dto.MemberSlice;
 import com.be.dohands.member.dto.MultiCursorResult;
 import com.be.dohands.member.dto.QuestExpConditionDto;
 import com.be.dohands.member.dto.QuestExpDto;
+import com.be.dohands.member.dto.QuestsInProgressRequestDTO;
+import com.be.dohands.member.dto.QuestsInProgressResponseDTO;
 import com.be.dohands.member.dto.UpdateCharacterDto;
 import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.dto.UpdatePasswordDto;
@@ -82,5 +84,12 @@ public class MemberController {
     public ResponseEntity<Member> updateCharacter(@RequestBody UpdateCharacterDto updateCharacterDto, @AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
         return ResponseEntity.ok(memberService.modifyCharacter(updateCharacterDto, loginId));
+    }
+
+    @GetMapping("/users/in-progress")
+    public ResponseEntity<QuestsInProgressResponseDTO> getQuestsInProgress(@AuthenticationPrincipal CustomUserDetails user,
+        @RequestBody QuestsInProgressRequestDTO request){
+        QuestsInProgressResponseDTO response = memberService.getQuestsInProgress(user, request);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
