@@ -29,6 +29,8 @@ import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,30 +53,44 @@ public class QuestService {
 
     @Transactional(readOnly = true)
     public QuestListResponseDTO getQuestList(String loginId){
-        Member user = memberRepository.findByLoginId(loginId).orElseThrow();
+        Member user = memberRepository.findByLoginId(loginId).orElseThrow(() -> new NoSuchElementException("없는 유저입니다."));
         Long userId = user.getUserId();
 
-        List<UserQuestEntity> userQuest = userQuestRepository.findAllByUserId(userId);
-        List<Quest> quests = userQuest.stream().map(e -> {
+        List<UserQuestEntity> userQuests = userQuestRepository.findAllByUserId(userId);
+        List<Quest> quests = (userQuests.stream().map(e -> {
 
             Integer month = null;
             Integer week = null;
             String questName = null;
-            Long userQuestId = userQuestRepository.findByQuestTypeAndQuestId(e.getQuestType(), e.getQuestId());
+            String doneResult = null;
 
-            Optional<QuestScheduleEntity> questSchedule = questScheduleRepository.findByQuestScheduleId(e.getQuestScheduleId());
+            QuestScheduleEntity questSchedule = questScheduleRepository.findByQuestScheduleId(e.getQuestScheduleId())
+                .orElseThrow(() -> new NoSuchElementException("퀘스트 스케쥴이 없습니다."));
+            UserQuestEntity userQuest = userQuestRepository.findByQuestScheduleIdAndUserId(questSchedule.getQuestScheduleId(), userId);
 
-            if (e.getQuestType().equals(QuestType.LEADER)){
-                Optional<LeaderQuestEntity> leaderQuest = leaderQuestRepository.findByLeaderQuestId(e.getQuestId());
-                if (leaderQuest.isPresent()) questName = leaderQuest.get().getQuestName();
-            }
-            else {
-                if (questSchedule.isPresent()) {
-                    if (questSchedule.get().getMonth() != null) month = questSchedule.get().getMonth();
-                    else week = questSchedule.get().getWeek();
+            if (e.getQuestType().equals(QuestType.LEADER)) {LeaderQuestEntity leaderQuest = leaderQuestRepository.findByLeaderQuestId(e.getQuestId())
+                    .orElseThrow(() -> new NoSuchElementException("리더 퀘스트를 찾을 수 없습니다."));
+                questName = leaderQuest.getQuestName();
+                if (userQuest.getStatusType().equals(StatusType.DONE)) {
+                    LeaderQuestExpEntity leaderQuestExp = leaderQuestExpRepository.findByLeaderQuestIdAndEmployeeNumber(
+                        leaderQuest.getLeaderQuestId(), user.getEmployeeNumber());
+                    Integer exp = leaderQuestExp.getExp();
+                    if (Objects.equals(leaderQuest.getMaxExp(), exp)) doneResult = "HIGH";
+                    else if (Objects.equals(leaderQuest.getMedianExp(), exp)) doneResult = "MIDDLE";
+                }
+            } else {
+                if (questSchedule.getMonth() != null) month = questSchedule.getMonth();
+                else week = questSchedule.getWeek();
+                if (userQuest.getStatusType().equals(StatusType.DONE)) {
+                    JobQuestEntity jobQuest = jobQuestRepository.findByJobQuestId(e.getQuestId())
+                        .orElseThrow(() -> new NoSuchElementException("없는 직무 퀘스트입니다."));
+                    JobQuestExpEntity jobQuestExp = jobQuestExpRepository.findByJobQuestIdAndSheetRow(jobQuest.getJobQuestId(), user.getSheetRow());
+                    Integer exp = jobQuestExp.getExp();
+                    if (Objects.equals(jobQuest.getMaxExp(), exp)) doneResult = "HIGH";
+                    else if (Objects.equals(jobQuest.getMedianExp(), exp)) doneResult = "MIDDLE";
+                    else doneResult = "LOW";
                 }
             }
-
             return Quest.builder()
                 .questId(e.getQuestId())
                 .questName(questName)
@@ -82,10 +98,10 @@ public class QuestService {
                 .week(week)
                 .questType(e.getQuestType())
                 .statusType(e.getStatusType())
-                .userQuestId(userQuestId)
+                .userQuestId(userQuest.getUserQuestId())
+                .result(doneResult)
                 .build();
-        }).toList();
-
+        }).toList());
         return QuestListResponseDTO.builder()
             .items(quests)
             .build();
