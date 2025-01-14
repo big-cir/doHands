@@ -35,10 +35,10 @@ public class ArticleService {
     public void saveArticle(CreateArticleDto dto) {
         Article article = new Article(dto.title(), dto.content());
         articleRepository.save(article);
-//        fcmService.send(NotificationDto.builder()
-//                        .notificationType(ARTICLE)
-//                        .build()
-//        );
+        fcmService.send(NotificationDto.builder()
+                        .notificationType(ARTICLE)
+                        .build()
+        );
     }
 
     @Transactional(readOnly = true)

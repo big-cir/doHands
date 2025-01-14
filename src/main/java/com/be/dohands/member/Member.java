@@ -80,8 +80,12 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-    public void updateCharacter(String characterType) {
+    public void updateCharacter(String characterType, Long skinId) {
         if (characterType != null && !characterType.isEmpty() && !characterType.isBlank()) {
+            this.characterType = characterType;
+        }
+
+        if (skinId != null) {
             this.characterType = characterType;
         }
     }
