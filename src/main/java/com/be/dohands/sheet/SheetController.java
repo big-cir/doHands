@@ -56,6 +56,7 @@ public class SheetController {
                 sheetService.readAndUpdateJobRequestSheet(payload);
                 break;
             case "참고. 인사평가":
+                sheetService.readAndUpdateEvaluationExpSheet(payload);
                 break;
             case "참고. 리더부여 퀘스트":
                 sheetService.readAndUpdateLeaderRequestSheet(payload);
