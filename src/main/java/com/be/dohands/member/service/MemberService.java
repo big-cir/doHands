@@ -93,7 +93,7 @@ public class MemberService {
     @Transactional
     public MemberResponse modifyCharacter(UpdateCharacterDto updateCharacterDto, String loginId) {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
-        member.updateCharacter(updateCharacterDto.characterType());
+        member.updateCharacter(updateCharacterDto.characterType(), updateCharacterDto.skinId());
         memberRepository.save(member);
         LevelExp level = findLevelExpById(member.getLevelId());
         return new MemberResponse(member, getLevelName(level));
