@@ -47,7 +47,9 @@ public class MemberProcessor extends SheetProcessor<Member>{
 
         Member member = memberBuilder.build();
 
-        return TransformResult.of(member, false);
+        Member savedMember = memberRepository.save(member);
+
+        return TransformResult.of(savedMember, false);
     }
 
     private Long getLevelExpId(String givenLevel) {
