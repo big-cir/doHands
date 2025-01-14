@@ -38,8 +38,20 @@ public class UserQuestEntity {
 
     private Long questScheduleId;
 
+    private Integer month;
+
+    private Integer week;
+
     @Setter
     @Enumerated(value = EnumType.STRING)
     private StatusType statusType;
+
+    public void statusTypeToDone() {
+        this.statusType = StatusType.DONE;
+    }
+
+    public void giveQuestExpId(Long expId) {
+        this.questExpId = expId;
+    }
 
 }

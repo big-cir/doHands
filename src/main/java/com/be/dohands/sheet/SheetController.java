@@ -57,6 +57,9 @@ public class SheetController {
                 break;
             case "참고. 인사평가":
                 break;
+            case "참고. 리더부여 퀘스트":
+                sheetService.readAndUpdateLeaderRequestSheet(payload);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown sheet name: " + sheetName);
         }

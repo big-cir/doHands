@@ -34,4 +34,9 @@ public class MemberExp extends BaseTimeEntity {
         this.cumulativeExp = 0;
         this.userId = userId;
     }
+
+    public void addToCurrentExp(Integer givenExp) {
+        this.currentExp += givenExp;
+    }
+
 }
