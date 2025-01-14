@@ -105,7 +105,9 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         member.updatePassword(updatePasswordDto.changePassword());
         memberRepository.save(member);
-        LevelExp level = findLevelExpById(member.getLevelId());
+
+        LevelExp level = null;
+        if (member.getLevelId() != null) level = findLevelExpById(member.getLevelId());
         return new MemberResponse(member, getLevelName(level));
     }
 
@@ -114,7 +116,9 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         member.updateCharacter(updateCharacterDto.characterType(), updateCharacterDto.skinId());
         memberRepository.save(member);
-        LevelExp level = findLevelExpById(member.getLevelId());
+
+        LevelExp level = null;
+        if (member.getLevelId() != null) level = findLevelExpById(member.getLevelId());
         return new MemberResponse(member, getLevelName(level));
     }
 
