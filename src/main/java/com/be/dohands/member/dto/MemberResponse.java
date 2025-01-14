@@ -19,6 +19,8 @@ public class MemberResponse {
     private String characterType;
     private String level;
     private LocalDate hireDate;
+    private String jobGroup;
+    private String jobCategory;
     private Long skinId;
     private Role role;
 
@@ -34,6 +36,8 @@ public class MemberResponse {
         this.characterType = member.getCharacterType();
         this.level = level;
         this.hireDate = member.getHireDate();
+        this.jobGroup = member.getJobGroup();
+        this.jobCategory = member.getJobCategory();
         this.skinId = member.getSkinId();
         this.role = member.getRole();
     }
