@@ -41,6 +41,8 @@ public interface UserQuestRepository extends JpaRepository<UserQuestEntity, Long
         + "where uq.questScheduleId = :questScheduleId and uq.userId = :userId")
     UserQuestEntity findByQuestScheduleIdAndUserId(@Param("questScheduleId") Long questScheduleId, @Param("userId") Long userId);
 
+    Optional<UserQuestEntity> findByQuestTypeAndQuestIdAndUserIdAndMonthAndWeek(QuestType questType, Long questId, Long userId, Integer month, Integer week);
+
     List<UserQuestEntity> findByQuestScheduleId(@Param("questScheduleId") Long questScheduleId);
 
     @Query(value = "select cast(coalesce(count(uq.userQuestId),0) as int) "

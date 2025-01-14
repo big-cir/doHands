@@ -28,6 +28,7 @@ public class SpreadSheetService {
     private final TfExpProcessor tfExpProcessor;
     private final JobQuestProcessor jobQuestProcessor;
     private final LevelExpProcessor levelExpProcessor;
+    private final LeaderQuestProcessor leaderQuestProcessor;
 
     private final MemberRepository memberRepository;
     private final LevelExpRepository levelExpRepository;
@@ -55,6 +56,10 @@ public class SpreadSheetService {
 
     public void readAndUpdateJobRequestSheet(Map<String, Object> payload) {
         jobQuestProcessor.readDividedSheetAndUpdateDb(payload);
+    }
+
+    public void readAndUpdateLeaderRequestSheet(Map<String, Object> payload) {
+        leaderQuestProcessor.readDividedSheetAndUpdateDb(payload);
     }
 
     public void readAndUpdateLevelExpSheet(Map<String, Object> payload) {

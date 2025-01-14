@@ -58,7 +58,7 @@ public class GenerateQuests {
                 .questId(jobQuest.getJobQuestId())
                 .build();
             questScheduleRepository.save(questSchedule);
-            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), questSchedule);
+            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), questSchedule, month, null);
         }
     }
 
@@ -72,7 +72,7 @@ public class GenerateQuests {
                 .questId(jobQuest.getJobQuestId())
                 .build();
             questScheduleRepository.save(questSchedule);
-            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), questSchedule);
+            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), questSchedule, null, week);
         }
     }
 
@@ -86,7 +86,7 @@ public class GenerateQuests {
                 .questId(leaderQuest.getLeaderQuestId())
                 .build();
             questScheduleRepository.save(questSchedule);
-            generateUserQuests(QuestType.LEADER, leaderQuest.getLeaderQuestId(), leaderQuest.getDepartment(), questSchedule);
+            generateUserQuests(QuestType.LEADER, leaderQuest.getLeaderQuestId(), leaderQuest.getDepartment(), questSchedule, month, null);
         }
     }
 
@@ -101,7 +101,7 @@ public class GenerateQuests {
                 .questId(leaderQuest.getLeaderQuestId())
                 .build();
             questScheduleRepository.save(questSchedule);
-            generateUserQuests(QuestType.LEADER, leaderQuest.getLeaderQuestId(), leaderQuest.getDepartment(), questSchedule);
+            generateUserQuests(QuestType.LEADER, leaderQuest.getLeaderQuestId(), leaderQuest.getDepartment(), questSchedule, null, week);
         }
     }
 
@@ -116,4 +116,19 @@ public class GenerateQuests {
             .statusType(StatusType.NOT_STARTED)
             .build()).forEach(userQuestRepository::save);
     }
+
+    public void generateUserQuests(QuestType questType, Long questId, String department, QuestScheduleEntity questSchedule, Integer month, Integer week){
+        List<Member> departmentMembers = memberRepository.findMembersByDepartment(department);
+        departmentMembers.stream().map(member -> UserQuestEntity.builder()
+            .questType(questType)
+            .questId(questId)
+            .questExpId(null)
+            .userId(member.getUserId())
+            .questScheduleId(questSchedule.getQuestScheduleId())
+            .statusType(StatusType.NOT_STARTED)
+            .month(month)
+            .week(week)
+            .build()).forEach(userQuestRepository::save);
+    }
+
 }
