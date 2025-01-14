@@ -4,6 +4,7 @@ import static com.be.dohands.member.dto.QuestResult.processQuestType;
 
 import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
+import com.be.dohands.evaluation.service.EvaluationExpService;
 import com.be.dohands.level.LevelExp;
 import com.be.dohands.level.service.LevelExpService;
 import com.be.dohands.member.dto.MemberResponse;
@@ -12,6 +13,7 @@ import com.be.dohands.member.dto.QuestsInProgressResponseDTO;
 import com.be.dohands.member.dto.QuestsInProgressResponseDTO.QuestInProgress;
 import com.be.dohands.member.dto.UpdateCharacterDto;
 import com.be.dohands.quest.data.QuestType;
+import com.be.dohands.quest.dto.QuestRecentDto;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
 import com.be.dohands.quest.entity.QuestScheduleEntity;
 import com.be.dohands.quest.entity.UserQuestEntity;
@@ -32,12 +34,20 @@ import com.be.dohands.member.dto.QuestExpDto;
 import com.be.dohands.member.dto.QuestResult;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.quest.service.LeaderQuestExpService;
 import com.be.dohands.tf.repository.TfExpQueryRepository;
+import com.be.dohands.tf.service.TfExpService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +66,10 @@ public class MemberService {
 
     private final JobQuestService jobQuestService;
     private final LevelExpService levelExpService;
+    private final EvaluationExpService evaluationExpService;
+    private final TfExpService tfExpService;
+    private final LeaderQuestExpService leaderQuestExpService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     private static final String[] questType = {"evaluation", "leader", "tf", "job"};
 
@@ -101,9 +115,50 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public Member findMember(String loginId) {
-        return memberRepository.findByLoginId(loginId).get();
+        return memberRepository.findByLoginId(loginId).orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public QuestRecentDto findRecentQuest(String loginId) {
+        String userId = String.valueOf(memberRepository.findByLoginId(loginId).get().getUserId());
+        boolean keyExists = redisTemplate.hasKey(String.valueOf(userId));
+        if (keyExists) {
+            String[] parts = redisTemplate.opsForValue().get(userId).split("\\|");
+            return new QuestRecentDto(parts[0],
+                    LocalDateTime.parse(parts[1]),
+                    Integer.parseInt(parts[2]));
+        }
+        return new QuestRecentDto("nothing", null, 0);
+    }
+
+    public void findRecentCompleteQuestWithOutJob(String type, String employeeNumber) {
+        // questType = {"evaluation", "leader", "tf", "job"};
+        QuestRecentDto recent = null;
+        Long userId = null;
+        if (type.equals(questType[0])) {
+            recent = evaluationExpService.findAllMostRecent(employeeNumber);
+            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
+        } else if (type.equals(questType[1])) {
+            recent = leaderQuestExpService.findAllMostRecent(employeeNumber);
+            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
+        } else if (type.equals(questType[2])) {
+            recent = tfExpService.findAllMostRecent(employeeNumber);
+            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
+        }
+
+        String key = String.valueOf(userId);
+        redisTemplate.opsForValue().set(key, getValue(recent));
+    }
+
+    public void findRecentCompleteJobQuest(String department) {
+        QuestRecentDto recent = jobQuestService.findAllMostRecent(department);
+        if (recent == null) return;
+
+        memberRepository.findMembersByDepartment(department)
+                        .forEach(m -> {
+                            redisTemplate.opsForValue().set(String.valueOf(m.getUserId()), getValue(recent));
+                        });
+    }
 
     @Transactional(readOnly = true)
     public QuestsInProgressResponseDTO getQuestsInProgress(CustomUserDetails user, QuestsInProgressRequestDTO request) {
@@ -124,6 +179,10 @@ public class MemberService {
         return QuestsInProgressResponseDTO.builder()
             .questsInProgressList(result)
             .build();
+    }
+
+    private String getValue(QuestRecentDto recent) {
+        return recent.questType() + "|" + recent.createdAt() + "|" + recent.exp();
     }
 
     private String getLevelName(LevelExp level) {

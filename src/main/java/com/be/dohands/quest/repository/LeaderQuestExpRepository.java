@@ -16,4 +16,6 @@ public interface LeaderQuestExpRepository extends JpaRepository<LeaderQuestExpEn
 
     Optional<LeaderQuestExpEntity> findBySheetRow(Integer sheetRow);
 
+    Optional<LeaderQuestExpEntity> findTopByEmployeeNumberOrderByCreatedAtDesc(String employeeNumber);
+
 }
