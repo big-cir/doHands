@@ -14,6 +14,4 @@ public interface JobQuestExpRepository extends JpaRepository<JobQuestExpEntity, 
     Optional<JobQuestExpEntity> findByJobQuestExpId(Long questExpId);
 
     Optional<JobQuestExpEntity> findBySheetRow(Integer sheetRow);
-
-    Optional<JobQuestExpEntity> findTopByJobQuestIdInOrderByCreatedAtDesc(List<Long> jobQuests);
 }

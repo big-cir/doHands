@@ -1,9 +1,9 @@
 package com.be.dohands.member.controller;
 
 import com.be.dohands.common.security.CustomUserDetails;
-import com.be.dohands.member.Member;
 import com.be.dohands.member.dto.CreateMemberDto;
 import com.be.dohands.member.dto.MemberExpStatusDto;
+import com.be.dohands.member.dto.MemberInfoResponseDTO;
 import com.be.dohands.member.dto.MemberResponse;
 import com.be.dohands.member.dto.MemberSlice;
 import com.be.dohands.member.dto.MultiCursorResult;
@@ -71,9 +71,10 @@ public class MemberController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<Member> getMember(@AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<MemberInfoResponseDTO> getMember(@AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
-        return ResponseEntity.ok(memberService.findMember(loginId));
+        MemberInfoResponseDTO response = memberService.findMember(loginId);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/users/password")

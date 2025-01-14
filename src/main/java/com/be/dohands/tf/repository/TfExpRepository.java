@@ -16,6 +16,4 @@ public interface TfExpRepository extends JpaRepository<TfExp, Long> {
         + "from TfExp tf left join Member m on tf.employeeNumber = m.employeeNumber "
         + "where m.userId = :userId")
     Integer countIdsByUserId(@Param("userId") Long userId);
-
-    Optional<TfExp> findTopByEmployeeNumberOrderByCreatedAtDesc(String employeeNumber);
 }

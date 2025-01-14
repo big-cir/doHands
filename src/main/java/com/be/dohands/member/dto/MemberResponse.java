@@ -21,7 +21,7 @@ public class MemberResponse {
     private LocalDate hireDate;
     private String jobGroup;
     private String jobCategory;
-    private Integer skinId;
+    private Long skinId;
     private Role role;
 
     public MemberResponse(Member member, String level) {
