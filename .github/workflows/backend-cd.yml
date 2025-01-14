@@ -15,6 +15,7 @@ jobs:
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
           FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
         run: |
+          mkdir -p src/main/resources/firebase
           echo "$GCP_CREDENTIALS" > src/main/resources/credentials.json
           echo "$FIREBASE_KEY" > src/main/resources/firebase/firebasekey.json
 
