@@ -27,5 +27,6 @@ public class QuestListResponseDTO {
         private QuestType questType;
         private StatusType statusType;
         private Long userQuestId;
+        private String result;
     }
 }
