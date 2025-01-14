@@ -2,10 +2,13 @@ package com.be.dohands.member.service;
 
 import static com.be.dohands.member.dto.QuestResult.processQuestType;
 
+import com.be.dohands.article.repository.ArticleRepository;
+import com.be.dohands.article.repository.MemberArticleRepository;
 import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
 import com.be.dohands.level.LevelExp;
 import com.be.dohands.level.service.LevelExpService;
+import com.be.dohands.member.dto.MemberInfoResponseDTO;
 import com.be.dohands.member.dto.MemberResponse;
 import com.be.dohands.member.dto.QuestsInProgressRequestDTO;
 import com.be.dohands.member.dto.QuestsInProgressResponseDTO;
@@ -53,6 +56,8 @@ public class MemberService {
     private final UserQuestRepository userQuestRepository;
     private final QuestScheduleRepository questScheduleRepository;
     private final LeaderQuestRepository leaderQuestRepository;
+    private final MemberArticleRepository memberArticleRepository;
+    private final ArticleRepository articleRepository;
 
     private final JobQuestService jobQuestService;
     private final LevelExpService levelExpService;
@@ -100,8 +105,22 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Member findMember(String loginId) {
-        return memberRepository.findByLoginId(loginId).get();
+    public MemberInfoResponseDTO findMember(String loginId) {
+
+        Member user = memberRepository.findByLoginId(loginId).get();
+        Integer unreadArticles = articleRepository.findAll().size() - memberArticleRepository.countUnreadArticles(user.getUserId());
+
+        return MemberInfoResponseDTO.builder()
+            .employeeNumber(user.getEmployeeNumber())
+            .name(user.getName())
+            .department(user.getDepartment())
+            .characterType(user.getCharacterType())
+            .levelName(user.getName())
+            .hireDate(user.getHireDate())
+            .jobCategory(user.getJobCategory())
+            .skinId(user.getSkinId())
+            .unreadArticles(unreadArticles)
+            .build();
     }
 
 
