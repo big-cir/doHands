@@ -40,7 +40,7 @@ public class Member extends BaseTimeEntity {
 
     private LocalDate hireDate;
 
-    private Long skinId;
+    private Integer skinId;
 
     @Enumerated(EnumType.STRING)
     private final Role role = Role.ROLE_USER;
@@ -59,6 +59,7 @@ public class Member extends BaseTimeEntity {
         this.department = department;
         this.levelId = levelId;
         this.hireDate = hireDate;
+        this.skinId = 1;
         this.characterType = "default";
         this.jobGroup = jobGroup;
         this.jobCategory = jobCategory;
@@ -80,13 +81,13 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-    public void updateCharacter(String characterType, Long skinId) {
+    public void updateCharacter(String characterType, Integer skinId) {
         if (characterType != null && !characterType.isEmpty() && !characterType.isBlank()) {
             this.characterType = characterType;
         }
 
         if (skinId != null) {
-            this.characterType = characterType;
+            this.skinId = skinId;
         }
     }
 
