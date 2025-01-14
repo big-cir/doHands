@@ -28,7 +28,10 @@ public class ArticleProcessor extends SheetProcessor<Article> {
         articleOptional.ifPresent(existMember -> articleBuilder.articleId(existMember.getArticleId()));
 
         Article article = articleBuilder.build();
-        return TransformResult.of(article, false);
+
+        Article savedArticle = articleRepository.save(article);
+
+        return TransformResult.of(savedArticle, false);
 
     }
 
