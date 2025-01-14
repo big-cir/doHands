@@ -93,11 +93,9 @@ public abstract class SheetProcessor<T> {
             int rowNumber = (int) row.get("rowNumber");                             // rowNumber 가져오기
             List<Object> rowData = (List<Object>) row.get("rowData");               // rowData 가져오기
             TransformResult<T> transformResult = transformRow(rowData,rowNumber);   // 변환
-            T entity = saveEntity(transformResult.getEntity());                     // 저장
-
-            // 저장된 엔티티로 TransformResult 생성
-            TransformResult<T> resultWithId = TransformResult.of(entity, transformResult.isNotificationYn());
-            results.add(resultWithId);
+//            T entity = saveEntity(transformResult.getEntity());
+//            TransformResult<T> resultWithId = TransformResult.of(entity, transformResult.isNotificationYn());
+            results.add(transformResult);
         }
 
         return results;
@@ -105,7 +103,6 @@ public abstract class SheetProcessor<T> {
 
     /**
      * 시트값 수정하는 메서드(앱 변경 -> 시트 자동 반영)
-     * credential.json 없어서 현재 사용 불가
      */
     public UpdateValuesResponse updateValues(String spreadsheetId,
         String range,
@@ -143,7 +140,6 @@ public abstract class SheetProcessor<T> {
 
     /**
      * 시트에 행 자동 추가하는 메서드(앱에서 생성 -> 시트 자동 반영)
-     * credential.json 없어서 현재 사용 불가
      */
     public AppendValuesResponse appendValues(String spreadsheetId,
         String range,

@@ -1,10 +1,14 @@
 package com.be.dohands.sheet;
 
 
+import com.be.dohands.member.Member;
+import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.member.service.MemberExpService;
 import com.be.dohands.tf.TfExp;
 import com.be.dohands.tf.TfExp.TfExpBuilder;
 import com.be.dohands.tf.repository.TfExpRepository;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +21,10 @@ import org.springframework.stereotype.Service;
 public class TfExpProcessor extends SheetProcessor<TfExp>{
 
     private final TfExpRepository tfExpRepository;
+    private final MemberRepository memberRepository;
+
+    private final MemberExpService memberExpService;
+
 
     @Override
     protected TransformResult<TfExp> transformRow(List<Object> rows, Integer sheetRow) {
@@ -36,7 +44,16 @@ public class TfExpProcessor extends SheetProcessor<TfExp>{
         tfExpOptional.ifPresent(existTfExp -> tfExpBuilder.tfExpId(existTfExp.getTfExpId()));
         TfExp tfExp = tfExpBuilder.build();
         boolean notificationYn = isNotificationYn(tfExpOptional, givenExp);
-        log.info("TFexp = " + tfExp + "\n notificationYN == " + notificationYn);
+
+        TfExp savedTfExp = tfExpRepository.save(tfExp);
+
+        Member member = memberRepository.findByEmployeeNumber(savedTfExp.getEmployeeNumber())
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사원번호"));
+
+        if (notificationYn) {
+            memberExpService.addGivenExp(member.getUserId(), tfExp.getExp());
+        }
+
         return TransformResult.of(tfExp, notificationYn);
     }
 
