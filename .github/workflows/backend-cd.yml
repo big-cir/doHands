@@ -13,8 +13,10 @@ jobs:
       - name: Set up GCP credentials
         env:
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+          FIREBASE_KEY: ${{ secrets.FIREBASE_KEY }}
         run: |
           echo "$GCP_CREDENTIALS" > src/main/resources/credentials.json
+          echo "$GCP_CREDENTIALS" > src/main/resources/firebase/firebasekey.json
 
       - name: Login to Docker Registry
         uses: docker/login-action@v3.0.0
@@ -40,3 +42,4 @@ jobs:
             sudo docker-compose down
             sudo docker pull ${{ secrets.DI }}/dohands:latest
             sudo docker-compose up -d
+            sudo docker volume prune
