@@ -5,11 +5,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class LeaderQuestEntity extends BaseTimeEntity {
 
@@ -38,4 +42,6 @@ public class LeaderQuestEntity extends BaseTimeEntity {
     private String notes;
 
     private Integer year;
+
+    private Integer sheetRow;
 }
