@@ -1,6 +1,7 @@
 package com.be.dohands.evaluation.repository;
 
 import com.be.dohands.evaluation.EvaluationExp;
+import com.be.dohands.evaluation.TermType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,7 @@ public interface EvaluationExpRepository extends JpaRepository<EvaluationExp, Lo
     Integer countIdsByUserIdAndYear(@Param("userId") Long userId, @Param("year") Integer year);
 
     Optional<EvaluationExp> findTopByEmployeeNumberOrderByCreatedAtDesc(String employeeNumber);
+
+    Optional<EvaluationExp> findEvaluationExpByEmployeeNumberAndTermTypeAndYear(String employeeNumber,
+        TermType termType, Integer year);
 }
