@@ -59,6 +59,7 @@ public class Member extends BaseTimeEntity {
         this.department = department;
         this.levelId = levelId;
         this.hireDate = hireDate;
+        this.skinId = 1L;
         this.characterType = "default";
         this.jobGroup = jobGroup;
         this.jobCategory = jobCategory;
@@ -86,7 +87,7 @@ public class Member extends BaseTimeEntity {
         }
 
         if (skinId != null) {
-            this.characterType = characterType;
+            this.skinId = skinId;
         }
     }
 

@@ -17,6 +17,8 @@ public interface EvaluationExpRepository extends JpaRepository<EvaluationExp, Lo
         + "where m.userId = :userId and e.year = :year")
     Integer countIdsByUserIdAndYear(@Param("userId") Long userId, @Param("year") Integer year);
 
+    Optional<EvaluationExp> findTopByEmployeeNumberOrderByCreatedAtDesc(String employeeNumber);
+
     Optional<EvaluationExp> findEvaluationExpByEmployeeNumberAndTermTypeAndYear(String employeeNumber,
         TermType termType, Integer year);
 }
