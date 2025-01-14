@@ -22,4 +22,6 @@ public class EvaluationExp extends BaseTimeEntity {
     private String grade;
 
     private Integer exp;
+
+    private String year;
 }

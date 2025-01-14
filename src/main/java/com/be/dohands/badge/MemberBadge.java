@@ -20,4 +20,9 @@ public class MemberBadge extends BaseTimeEntity {
     private Long userId;
 
     private Long badgeId;
+
+    public MemberBadge(Long userId, Long badgeId) {
+        this.userId = userId;
+        this.badgeId = badgeId;
+    }
 }
