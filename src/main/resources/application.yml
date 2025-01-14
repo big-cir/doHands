@@ -20,6 +20,13 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      password: ${REDIS_PASSWORD}
+      port: ${REDIS_PORT}
+
+
 firebase:
   service-account-path: ${ACCOUNT_PATH}
   url: https://fcm.googleapis.com/v1/projects/${PROJECT_ID}/messages:send

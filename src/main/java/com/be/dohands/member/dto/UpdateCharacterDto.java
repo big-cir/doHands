@@ -1,4 +1,4 @@
 package com.be.dohands.member.dto;
 
-public record UpdateCharacterDto(String characterType) {
+public record UpdateCharacterDto(String characterType, Long skinId) {
 }
