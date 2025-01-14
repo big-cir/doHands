@@ -1,7 +1,6 @@
 package com.be.dohands.member.controller;
 
 import com.be.dohands.common.security.CustomUserDetails;
-import com.be.dohands.member.Member;
 import com.be.dohands.member.dto.CreateMemberDto;
 import com.be.dohands.member.dto.MemberExpStatusDto;
 import com.be.dohands.member.dto.MemberInfoResponseDTO;
@@ -17,6 +16,7 @@ import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.dto.UpdatePasswordDto;
 import com.be.dohands.member.service.MemberAdminService;
 import com.be.dohands.member.service.MemberService;
+import com.be.dohands.quest.dto.QuestRecentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -94,5 +94,12 @@ public class MemberController {
         @RequestBody QuestsInProgressRequestDTO request){
         QuestsInProgressResponseDTO response = memberService.getQuestsInProgress(user, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/recent-exp")
+    public ResponseEntity<QuestRecentDto> getRecentExp(@AuthenticationPrincipal CustomUserDetails user) {
+        String loginId = user.getUsername();
+        memberService.findRecentCompleteJobQuest("음성1센터");
+        return ResponseEntity.ok(memberService.findRecentQuest(loginId));
     }
 }
