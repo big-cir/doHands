@@ -6,6 +6,7 @@ import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
 import com.be.dohands.level.LevelExp;
 import com.be.dohands.level.service.LevelExpService;
+import com.be.dohands.member.dto.MemberResponse;
 import com.be.dohands.member.dto.QuestsInProgressRequestDTO;
 import com.be.dohands.member.dto.QuestsInProgressResponseDTO;
 import com.be.dohands.member.dto.QuestsInProgressResponseDTO.QuestInProgress;
@@ -81,17 +82,21 @@ public class MemberService {
     }
 
     @Transactional
-    public Member modifyPassword(UpdatePasswordDto updatePasswordDto, String loginId) {
+    public MemberResponse modifyPassword(UpdatePasswordDto updatePasswordDto, String loginId) {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         member.updatePassword(updatePasswordDto.changePassword());
-        return memberRepository.save(member);
+        memberRepository.save(member);
+        LevelExp level = findLevelExpById(member.getLevelId());
+        return new MemberResponse(member, getLevelName(level));
     }
 
     @Transactional
-    public Member modifyCharacter(UpdateCharacterDto updateCharacterDto, String loginId) {
+    public MemberResponse modifyCharacter(UpdateCharacterDto updateCharacterDto, String loginId) {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         member.updateCharacter(updateCharacterDto.characterType());
-        return memberRepository.save(member);
+        memberRepository.save(member);
+        LevelExp level = findLevelExpById(member.getLevelId());
+        return new MemberResponse(member, getLevelName(level));
     }
 
     @Transactional(readOnly = true)
@@ -119,6 +124,14 @@ public class MemberService {
         return QuestsInProgressResponseDTO.builder()
             .questsInProgressList(result)
             .build();
+    }
+
+    private String getLevelName(LevelExp level) {
+        return level != null ? level.getName() : null;
+    }
+
+    private LevelExp findLevelExpById(Long levelId) {
+        return levelExpService.findLevelExp(levelId);
     }
 
     private void findQuestsInProgress(List<QuestInProgress> questsInProgressList,
