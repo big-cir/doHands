@@ -76,13 +76,13 @@ public class MemberController {
     }
 
     @PatchMapping("/users/password")
-    public ResponseEntity<Member> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<MemberResponse> updatePassword(@RequestBody UpdatePasswordDto updatePasswordDto, @AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
         return ResponseEntity.ok(memberService.modifyPassword(updatePasswordDto, loginId));
     }
 
     @PatchMapping("/users/character")
-    public ResponseEntity<Member> updateCharacter(@RequestBody UpdateCharacterDto updateCharacterDto, @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<MemberResponse> updateCharacter(@RequestBody UpdateCharacterDto updateCharacterDto, @AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
         return ResponseEntity.ok(memberService.modifyCharacter(updateCharacterDto, loginId));
     }
