@@ -9,6 +9,9 @@ import com.be.dohands.notification.repository.FcmTokenRepository;
 import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.AndroidConfig;
 import com.google.firebase.messaging.AndroidNotification;
+import com.google.firebase.messaging.ApnsConfig;
+import com.google.firebase.messaging.Aps;
+import com.google.firebase.messaging.ApsAlert;
 import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
@@ -50,16 +53,45 @@ public class FcmService {
     }
 
     private void getExpNotification(Long userId, Map<String, String> data) {
+        String title = data.get("title");
+        String content = data.get("content");
         String token = fcmTokenRepository.findByUserId(userId).getToken();
-        getFirebaseInstance().sendAsync(
+
+        ApiFuture<String> stringApiFuture = getFirebaseInstance().sendAsync(
                 Message.builder()
                         .setToken(token)
                         .putAllData(data)
+                        .setAndroidConfig(AndroidConfig.builder()
+                                .setNotification(AndroidNotification.builder()
+                                        .setTitle(title)
+                                        .setBody(content)
+                                        .build()
+                                )
+                                .build()
+                        )
+                        .setApnsConfig(ApnsConfig.builder()
+                                .setAps(Aps.builder()
+                                        .setAlert(ApsAlert.builder()
+                                                .setTitle(title)
+                                                .setBody(content)
+                                                .build())
+                                        .build()
+                                )
+                                .build())
                         .build()
         );
+
+        try {
+            String response = stringApiFuture.get();
+            log.info(response + " messages were sent successfully");
+        } catch (InterruptedException | ExecutionException e) {
+            log.info("Error sending message: " + e.getMessage());
+        }
     }
 
     private void createArticleNotification(Map<String, String> data) {
+        String title = data.get("title");
+        String content = data.get("content");
         List<String> tokens = fcmTokenRepository.findAll().stream()
                 .map(FcmTokenEntity::getToken)
                 .toList();
@@ -68,16 +100,23 @@ public class FcmService {
                 MulticastMessage.builder()
                         .addAllTokens(tokens)
                         .putAllData(data)
-                        .setAndroidConfig(
-                                AndroidConfig.builder()
-                                        .setNotification(
-                                                AndroidNotification.builder()
-                                                        .setTitle(data.get("title"))
-                                                        .setBody(data.get("content"))
-                                                        .build()
-                                        )
-                                        .build()
+                        .setAndroidConfig(AndroidConfig.builder()
+                                .setNotification(AndroidNotification.builder()
+                                                .setTitle(title)
+                                                .setBody(content)
+                                                .build()
+                                )
+                                .build()
                         )
+                        .setApnsConfig(ApnsConfig.builder()
+                                        .setAps(Aps.builder()
+                                                .setAlert(ApsAlert.builder()
+                                                        .setTitle(title)
+                                                        .setBody(content)
+                                                        .build())
+                                                .build()
+                                        )
+                                .build())
                         .build()
         );
 

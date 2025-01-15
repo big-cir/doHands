@@ -1,5 +1,7 @@
 package com.be.dohands.sheet;
 
+import static com.be.dohands.notification.data.NotificationType.ARTICLE;
+
 import com.be.dohands.evaluation.EvaluationExp;
 import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
@@ -8,6 +10,9 @@ import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.member.service.MemberExpService;
 import com.be.dohands.member.service.MemberService;
+import com.be.dohands.notification.data.NotificationType;
+import com.be.dohands.notification.dto.NotificationDto;
+import com.be.dohands.notification.service.FcmService;
 import com.be.dohands.quest.entity.JobQuestEntity;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
 import com.be.dohands.quest.entity.LeaderQuestExpEntity;
@@ -43,6 +48,7 @@ public class SpreadSheetService {
     private final LevelExpRepository levelExpRepository;
     private final MemberExpRepository memberExpRepository;
     private final MemberExpService memberExpService;
+    private final FcmService fcmService;
 
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
@@ -58,10 +64,10 @@ public class SpreadSheetService {
 
     public void readAndUpdateArticleSheet(Map<String, Object> payload) {
         articleProcessor.readSheetAndUpdateDb(payload);
+        fcmService.send(new NotificationDto(null, null, ARTICLE));
     }
 
     public void readAndUpdateTfExpSheet(Map<String, Object> payload) {
-        List<TransformResult<TfExp>> transformResults = tfExpProcessor.readSheetAndUpdateDb(payload);
         tfExpProcessor.readSheetAndUpdateDb(payload).stream()
                 .map(TransformResult::getEntity)
                 .filter(Objects::nonNull)

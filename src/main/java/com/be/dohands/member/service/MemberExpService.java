@@ -1,9 +1,14 @@
 package com.be.dohands.member.service;
 
+import static com.be.dohands.notification.data.NotificationType.EXP;
+
 import com.be.dohands.evaluation.service.EvaluationExpService;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.notification.data.NotificationType;
+import com.be.dohands.notification.dto.NotificationDto;
+import com.be.dohands.notification.service.FcmService;
 import com.be.dohands.quest.dto.QuestRecentDto;
 import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.quest.service.LeaderQuestExpService;
@@ -26,6 +31,7 @@ public class MemberExpService {
     private final JobQuestService jobQuestService;
     private final TfExpService tfExpService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final FcmService fcmService;
 
     private static final String[] questType = {"evaluation", "leader", "tf", "job"};
 
@@ -53,6 +59,10 @@ public class MemberExpService {
         }
 
         String key = String.valueOf(userId);
+        if (userId != null) {
+            fcmService.send(new NotificationDto(userId, recent.exp(), EXP));
+        }
+
         redisTemplate.opsForValue().set(key, getValue(recent));
     }
 
@@ -63,6 +73,7 @@ public class MemberExpService {
         memberRepository.findMembersByDepartment(department)
                 .forEach(m -> {
                     redisTemplate.opsForValue().set(String.valueOf(m.getUserId()), getValue(recent));
+                    fcmService.send(new NotificationDto(m.getUserId(), recent.exp(), EXP));
                 });
     }
 
