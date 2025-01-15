@@ -14,6 +14,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.firebase.messaging.Notification;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,12 @@ public class FcmService {
         getFirebaseInstance().sendMulticastAsync(
                 MulticastMessage.builder()
                         .addAllTokens(tokens)
-                        .putAllData(data)
+                        // .putAllData(data)
+                        .setNotification(
+                                Notification.builder()
+                                .setTitle(data.get("title"))
+                                .setBody("content")
+                                .build())
                         .build()
         );
     }
