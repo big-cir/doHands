@@ -4,18 +4,15 @@ package com.be.dohands.sheet;
 import com.be.dohands.common.schedules.GenerateQuests;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.member.service.MemberExpService;
 import com.be.dohands.quest.data.QuestType;
-import com.be.dohands.quest.data.StatusType;
 import com.be.dohands.quest.entity.JobQuestEntity;
 import com.be.dohands.quest.entity.JobQuestEntity.JobQuestEntityBuilder;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
 import com.be.dohands.quest.entity.JobQuestExpEntity.JobQuestExpEntityBuilder;
-import com.be.dohands.quest.entity.UserQuestEntity;
 import com.be.dohands.quest.repository.JobQuestExpRepository;
 import com.be.dohands.quest.repository.JobQuestRepository;
-import com.be.dohands.quest.repository.LeaderQuestRepository;
-import com.be.dohands.quest.repository.QuestScheduleRepository;
-import com.be.dohands.quest.repository.UserQuestRepository;
+import com.be.dohands.quest.service.UserQuestService;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -38,10 +35,10 @@ public class JobQuestProcessor {
     private final JobQuestRepository jobQuestRepository;
     private final JobQuestExpRepository jobQuestExpRepository;
     private final MemberRepository memberRepository;
-    private final UserQuestRepository userQuestRepository;
-    private final QuestScheduleRepository questScheduleRepository;
-    private final LeaderQuestRepository leaderQuestRepository;
     private final GenerateQuests generateQuests;
+
+    private final UserQuestService userQuestService;
+    private final MemberExpService memberExpService;
 
     // 퀘스트 생성 시 연도 : 시트 미기재 속성이여서 시스템에서 직접 지정
     private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
@@ -69,14 +66,14 @@ public class JobQuestProcessor {
         Map<String, Object> data1Row = data1.get(0);
         int rowNumber1 = (int) data1Row.get("rowNumber");                             // rowNumber 가져오기
         List<Object> rowData1 = (List<Object>) data1Row.get("rowData");               // rowData 가져오기
-        JobQuestEntity jobQuestEntity = makeJobQuestEntity(rowData1, rowNumber1);      // 변환
+        JobQuestEntity jobQuestEntity = makeJobQuestEntity(rowData1, rowNumber1);
 
         // jobQuestExpEntity 작업
         if (data2 != null) {
             for (Map<String, Object> row : data2) {
-                int rowNumber = (int) row.get("rowNumber");                             // rowNumber 가져오기
-                List<Object> rowData = (List<Object>) row.get("rowData");               // rowData 가져오기
-                TransformResult transformResult = makeJobQuestExpTransformResult(rowData,rowNumber,jobQuestEntity);   // 변환
+                int rowNumber = (int) row.get("rowNumber");
+                List<Object> rowData = (List<Object>) row.get("rowData");
+                TransformResult transformResult = makeJobQuestExpTransformResult(rowData,rowNumber,jobQuestEntity);
                 results.add(transformResult);
             }
         }
@@ -91,24 +88,31 @@ public class JobQuestProcessor {
      */
     private JobQuestEntity makeJobQuestEntity(List rows, Integer sheetRow) {
 
-        Optional<JobQuestEntity> jobQuestEntityOptional = jobQuestRepository.findBySheetRow(sheetRow);
+        String department = rows.get(4).toString();
+        String jobGroup = rows.get(5).toString();
+        String period = rows.get(6).toString();
+        Optional<JobQuestEntity> jobQuestEntityOptional = jobQuestRepository.findJobQuestEntityByDepartmentAndJobGroupAndPeriod(
+            department, jobGroup, period);
 
         JobQuestEntityBuilder jobQuestEntityBuilder = JobQuestEntity.builder()
             .maxExp(TypeConversionUtil.toInteger(rows.get(0).toString()))
             .medianExp(TypeConversionUtil.toInteger(rows.get(1)))
-            .department(rows.get(4).toString())
-            .jobGroup(rows.get(5).toString())
-            .period(rows.get(6).toString())
+            .department(department)
+            .jobGroup(jobGroup)
+            .period(period)
             .sheetRow(sheetRow)
             .year(YEAR);
 
         jobQuestEntityOptional.ifPresent(existMember -> jobQuestEntityBuilder.jobQuestId(existMember.getJobQuestId()));
 
         JobQuestEntity jobQuestEntity = jobQuestEntityBuilder.build();
-        generateQuests.generateJobQuestSchedule(jobQuestEntity);
+        JobQuestEntity savedJobQuest = jobQuestRepository.save(jobQuestEntity);
 
-        return jobQuestRepository.save(jobQuestEntity);
+        if (jobQuestEntityOptional.isEmpty()) {
+            generateQuests.generateJobQuestSchedule(savedJobQuest);
+        }
 
+        return savedJobQuest;
     }
 
     /**
@@ -118,7 +122,7 @@ public class JobQuestProcessor {
      */
     public TransformResult<JobQuestExpEntity> makeJobQuestExpTransformResult(List rows, Integer sheetRow, JobQuestEntity jobQuestEntity) {
 
-        Optional<JobQuestExpEntity> jobQuestExpEntityOptional = jobQuestExpRepository.findBySheetRow(sheetRow);
+        Optional<JobQuestExpEntity> jobQuestExpEntityOptional = jobQuestExpRepository.findByJobQuestIdAndSheetRow(jobQuestEntity.getJobQuestId(), sheetRow);
 
         JobQuestExpEntity entity = makeJobQuestExpEntityBySheet(rows, sheetRow, jobQuestEntity,
             jobQuestExpEntityOptional);
@@ -127,36 +131,21 @@ public class JobQuestProcessor {
 
         JobQuestExpEntity savedJobQuestExp = jobQuestExpRepository.save(entity);
 
-        //IF. jobQuestExp 처음 생성되는 경우, UserQuest 테이블 생성
-        if (jobQuestExpEntityOptional.isEmpty()) {
-            makeUserQuestEntity(jobQuestEntity, savedJobQuestExp);
-        }
-
-        return TransformResult.of(savedJobQuestExp, notificationYn);
-    }
-
-    /**
-     * JobQuestExpEntity 생성 시,
-     * JobQuestEntity (department, jobGroup)에 맞는 모든 member UserQuestEntity 생성 메서드
-     */
-    private void makeUserQuestEntity(JobQuestEntity jobQuestEntity, JobQuestExpEntity savedJobQuestExp) {
         List<Member> memberList = memberRepository.findMembersByDepartmentAndJobGroup(
             jobQuestEntity.getDepartment(), jobQuestEntity.getJobGroup());
 
-        if (memberList.isEmpty()) {
-            return;
+        for (Member member : memberList) {
+            System.out.println(member.toString());
+            userQuestService.changeStatusTypeToDoneAndInsertExpId(savedJobQuestExp.getJobQuestExpId(), QuestType.JOB,
+                savedJobQuestExp.getJobQuestId(), member.getUserId(),
+                savedJobQuestExp.getMonth(), savedJobQuestExp.getWeek());
+
+            if (notificationYn) {
+                memberExpService.addGivenExp(member.getUserId(), entity.getExp());
+            }
         }
 
-        for (Member member : memberList) {
-            UserQuestEntity userQuest = UserQuestEntity.builder()
-                .questType(QuestType.JOB)
-                .questId(jobQuestEntity.getJobQuestId())
-                .questExpId(savedJobQuestExp.getJobQuestExpId())
-                .userId(member.getUserId())
-                .statusType(StatusType.NOT_STARTED)
-                .build();
-            userQuestRepository.save(userQuest);
-        }
+        return TransformResult.of(savedJobQuestExp, notificationYn);
     }
 
     /**
@@ -181,39 +170,6 @@ public class JobQuestProcessor {
 
         return jobQuestExpEntityBuilder.build();
     }
-
-//    /**
-//     * JobQuestExpEntity 생성 및 알림 전송 여부 반환 메서드
-//     * @param : 스프레드 시트 데이터 & 해당하는 JobQuestEntity
-//     * @return JobQuestExpEntity & 알림 전송 여부
-//     */
-//    public TransformResult<JobQuestExpEntity> makeJobQuestExpTransformResult(List rows, Integer sheetRow, JobQuestEntity jobQuestEntity) {
-//
-//        Optional<JobQuestExpEntity> jobQuestExpEntityOptional = jobQuestExpRepository.findBySheetRow(sheetRow);
-//
-//        Integer givenExp = TypeConversionUtil.toInteger(rows.get(1).toString());
-//        JobQuestExpEntityBuilder jobQuestExpEntityBuilder = JobQuestExpEntity.builder()
-//            .exp(givenExp)
-//            .notes(rows.get(2).toString())
-//            .maxStandard(TypeConversionUtil.toFloat(rows.get(4).toString()))
-//            .medianStandard(TypeConversionUtil.toFloat(rows.get(5).toString()))
-//            .productivity(TypeConversionUtil.toFloat(rows.get(7).toString()))
-//            .month(TypeConversionUtil.toInteger(rows.get(8).toString()))
-//            .week(TypeConversionUtil.toInteger(rows.get(9).toString()))
-//            .endDate(DateUtil.toLocalDateTime(rows.get(10).toString()))
-//            .jobQuestId(jobQuestEntity.getJobQuestId())
-//            .sheetRow(sheetRow);
-//
-//        jobQuestExpEntityOptional.ifPresent(existMember -> jobQuestExpEntityBuilder.jobQuestExpId(existMember.getJobQuestExpId()));
-//
-//        JobQuestExpEntity entity = jobQuestExpEntityBuilder.build();
-//        boolean notificationYn = isNotificationYn(jobQuestExpEntityOptional, givenExp);
-//
-//        JobQuestExpEntity savedJobQuestExp = jobQuestExpRepository.save(entity);
-//
-//        return TransformResult.of(savedJobQuestExp, notificationYn);
-//    }
-
 
     private boolean isNotificationYn(Optional<JobQuestExpEntity> jobQuestExpEntityOptional, Integer givenExp) {
         boolean notificationYn = jobQuestExpEntityOptional.isEmpty() && givenExp != null;
