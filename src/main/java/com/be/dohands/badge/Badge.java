@@ -24,4 +24,9 @@ public class Badge extends BaseTimeEntity {
     @Comment("배지 획득 조건")
     @Column(name = "badge_condition")
     private String condition;
+
+    public Badge(String name, String condition) {
+        this.name = name;
+        this.condition = condition;
+    }
 }

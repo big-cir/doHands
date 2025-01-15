@@ -19,6 +19,6 @@ public class BadgeResponseDTO {
         private Long badgeId;
         private String name;
         private String condition;
-        private Boolean acheived;
+        private Boolean achieved;
     }
 }
