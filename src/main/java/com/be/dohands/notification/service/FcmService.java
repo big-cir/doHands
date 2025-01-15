@@ -9,6 +9,7 @@ import com.be.dohands.notification.repository.FcmTokenRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.Notification;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,11 @@ public class FcmService {
                 MulticastMessage.builder()
                         .addAllTokens(tokens)
                         .putAllData(data)
+                        .setNotification(
+                                Notification.builder()
+                                        .setTitle(data.get("title"))
+                                        .setBody(data.get("content"))
+                                        .build())
                         .build()
         );
     }
