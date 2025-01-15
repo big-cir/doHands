@@ -1,5 +1,7 @@
 package com.be.dohands.member.service;
 
+import static com.be.dohands.sheet.SheetController.spreadsheetId;
+
 import com.be.dohands.level.LevelExp;
 import com.be.dohands.level.service.LevelExpService;
 import com.be.dohands.member.Member;
@@ -11,11 +13,14 @@ import com.be.dohands.member.dto.UpdateMemberDto;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberQueryRepository;
 import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.sheet.SpreadSheetService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberAdminService {
@@ -24,6 +29,7 @@ public class MemberAdminService {
     private final MemberQueryRepository memberQueryRepository;
     private final MemberExpRepository memberExpRepository;
     private final LevelExpService levelExpService;
+    private final SpreadSheetService spreadSheetService;
 
     @Transactional
     public void saveMember(CreateMemberDto dto) {
@@ -31,6 +37,13 @@ public class MemberAdminService {
             LevelExp level = findLevelExpByName(dto.level());
             Member member = memberRepository.save(dto.toMember(level != null ? level.getLevelExpId() : null));
             createMemberExp(member.getUserId());
+
+            try {
+                spreadSheetService.createMemberInfoToSheet(spreadsheetId, member);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
         } else {
             throw new RuntimeException("중복된 사용자 ID");
         }
@@ -78,6 +91,13 @@ public class MemberAdminService {
                 (level != null ? level.getLevelExpId() : null), dto.jobGroup(), dto.jobCategory()
         );
         memberRepository.save(member);
+
+        try {
+            spreadSheetService.changeMemberPassword(spreadsheetId, member.getPassword(), userId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         return new MemberResponse(member, getLevelName(level));
     }
 
