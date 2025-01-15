@@ -93,7 +93,7 @@ public class MemberAdminService {
         memberRepository.save(member);
 
         try {
-            spreadSheetService.changeMemberPassword(spreadsheetId, member.getPassword(), userId);
+            spreadSheetService.changeMemberInfos(spreadsheetId, member);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

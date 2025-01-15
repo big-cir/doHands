@@ -28,7 +28,7 @@ class SpreadSheetServiceTest {
 
         Member member = Member.builder()
             .loginId("김땡땡_두핸즈")                  // 로그인 ID
-            .password("1111")          // 비밀번호
+            .password("1234")          // 비밀번호
             .employeeNumber("2022011511")           // 사번
             .department("음성 1센터")          // 부서
             .name("김땡땡")                     // 이름

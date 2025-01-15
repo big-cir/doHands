@@ -90,6 +90,22 @@ public class SpreadSheetService {
         memberProcessor.updateValues(spreadsheetId, sheetLocation, "RAW", values);
     }
 
+    public void changeMemberInfos(String spreadsheetId, Member member)
+        throws GeneralSecurityException, IOException {
+
+        String sheetName = "참고. 구성원 정보";
+        String sheetLocation = sheetName + "!C" + member.getSheetRow() + ":J" + member.getSheetRow() ;
+
+        String levelName = levelExpRepository.findById(member.getLevelId())
+            .map(levelExp -> levelExp.getName())
+            .orElseThrow(() -> new NoSuchElementException("존재하지않는 레벨ID"));
+
+        List<List<Object>> values = new ArrayList<>();
+        values.add(List.of(member.getName(),DateUtil.localDateToString(member.getHireDate()), member.getDepartment(), member.getJobGroup(), levelName, member.getLoginId(), "1234", member.getPassword()));
+
+        memberProcessor.updateValues(spreadsheetId, sheetLocation, "RAW", values);
+    }
+
     /**
      * admin에서 등록한 계정 정보 시트에 자동 추가하는 메서드
      */
@@ -97,7 +113,7 @@ public class SpreadSheetService {
         throws GeneralSecurityException, IOException {
 
         String sheetName = "참고. 구성원 정보";
-        String sheetLocation = sheetName + "!J:J";
+        String sheetLocation = sheetName + "!B:J";
 
         List<List<Object>> values = new ArrayList<>();
         String levelName = levelExpRepository.findById(member.getLevelId())
@@ -122,7 +138,7 @@ public class SpreadSheetService {
 
         Member member = Member.builder()
             .loginId("김테스_두핸즈")
-            .password("1111")
+            .password("1234")
             .employeeNumber("2024011588")
             .department("음성 1센터")
             .name("김테스")
