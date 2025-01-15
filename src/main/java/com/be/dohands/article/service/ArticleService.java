@@ -46,14 +46,17 @@ public class ArticleService {
         if (next.isEmpty()) next = null;
         Long nextId = next == null ? null : Long.parseLong(next);
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
+
         ArticleSlice articles = articleQueryRepository.findAllArticles(nextId, size);
-        articles.getItems()
-                .forEach(item -> {
-                    if (memberArticleRepository.findMemberArticleByUserIdAndAndArticleId(member.getUserId(),
-                            item.getArticleId()).isPresent()) {
-                        item.updateRead();
-                    }
-                });
+        if (articles.getItems() != null) {
+            articles.getItems()
+                    .forEach(item -> {
+                        if (memberArticleRepository.findMemberArticleByUserIdAndAndArticleId(member.getUserId(),
+                                item.getArticleId()).isPresent()) {
+                            item.updateRead();
+                        }
+                    });
+        }
 
         return articles;
     }
