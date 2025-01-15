@@ -35,13 +35,13 @@ public class ArticleQueryRepository {
         if (articles != null && articles.size() >= size) {
             next = articles.get(articles.size() - 1).getArticleId();
             hasNext = true;
-
-            list = articles.stream()
-                    .map(a -> new ArticleDto(
-                            a.getArticleId(), a.getTitle(), a.getContent(), false
-                    ))
-                    .collect(Collectors.toList());
         }
+
+        list = articles.stream()
+                .map(a -> new ArticleDto(
+                        a.getArticleId(), a.getTitle(), a.getContent(), false
+                ))
+                .collect(Collectors.toList());
 
         return new ArticleSlice(list, next, hasNext);
     }

@@ -1,6 +1,7 @@
 package com.be.dohands.member.service;
 
 import static com.be.dohands.member.dto.QuestResult.processQuestType;
+import static com.be.dohands.sheet.SheetController.spreadsheetId;
 
 import com.be.dohands.article.repository.ArticleRepository;
 import com.be.dohands.article.repository.MemberArticleRepository;
@@ -38,6 +39,7 @@ import com.be.dohands.member.dto.QuestResult;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.quest.service.LeaderQuestExpService;
+import com.be.dohands.sheet.SpreadSheetService;
 import com.be.dohands.tf.repository.TfExpQueryRepository;
 import com.be.dohands.tf.service.TfExpService;
 import java.time.LocalDateTime;
@@ -50,10 +52,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -74,6 +78,7 @@ public class MemberService {
     private final EvaluationExpService evaluationExpService;
     private final TfExpService tfExpService;
     private final LeaderQuestExpService leaderQuestExpService;
+    private final SpreadSheetService spreadSheetService;
     private final RedisTemplate<String, String> redisTemplate;
 
     private static final String[] questType = {"evaluation", "leader", "tf", "job"};
@@ -105,6 +110,12 @@ public class MemberService {
         Member member = memberRepository.findByLoginId(loginId).orElseThrow();
         member.updatePassword(updatePasswordDto.changePassword());
         memberRepository.save(member);
+
+        try {
+            spreadSheetService.changeMemberPassword(spreadsheetId, member.getPassword(), member.getUserId());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         LevelExp level = null;
         if (member.getLevelId() != null) level = findLevelExpById(member.getLevelId());
@@ -154,35 +165,6 @@ public class MemberService {
         return new QuestRecentDto("nothing", null, 0);
     }
 
-    public void findRecentCompleteQuestWithOutJob(String type, String employeeNumber) {
-        // questType = {"evaluation", "leader", "tf", "job"};
-        QuestRecentDto recent = null;
-        Long userId = null;
-        if (type.equals(questType[0])) {
-            recent = evaluationExpService.findAllMostRecent(employeeNumber);
-            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
-        } else if (type.equals(questType[1])) {
-            recent = leaderQuestExpService.findAllMostRecent(employeeNumber);
-            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
-        } else if (type.equals(questType[2])) {
-            recent = tfExpService.findAllMostRecent(employeeNumber);
-            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
-        }
-
-        String key = String.valueOf(userId);
-        redisTemplate.opsForValue().set(key, getValue(recent));
-    }
-
-    public void findRecentCompleteJobQuest(String department) {
-        QuestRecentDto recent = jobQuestService.findAllMostRecent(department);
-        if (recent == null) return;
-
-        memberRepository.findMembersByDepartment(department)
-                        .forEach(m -> {
-                            redisTemplate.opsForValue().set(String.valueOf(m.getUserId()), getValue(recent));
-                        });
-    }
-
     @Transactional(readOnly = true)
     public QuestsInProgressResponseDTO getQuestsInProgress(CustomUserDetails user, QuestsInProgressRequestDTO request) {
         List<QuestInProgress> result = new ArrayList<>();
@@ -202,10 +184,6 @@ public class MemberService {
         return QuestsInProgressResponseDTO.builder()
             .questsInProgressList(result)
             .build();
-    }
-
-    private String getValue(QuestRecentDto recent) {
-        return recent.questType() + "|" + recent.createdAt() + "|" + recent.exp();
     }
 
     private String getLevelName(LevelExp level) {

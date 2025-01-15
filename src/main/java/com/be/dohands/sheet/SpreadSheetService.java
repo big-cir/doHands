@@ -1,10 +1,22 @@
 package com.be.dohands.sheet;
 
+import static com.be.dohands.notification.data.NotificationType.ARTICLE;
+
+import com.be.dohands.evaluation.EvaluationExp;
 import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.member.service.MemberExpService;
+import com.be.dohands.member.service.MemberService;
+import com.be.dohands.notification.data.NotificationType;
+import com.be.dohands.notification.dto.NotificationDto;
+import com.be.dohands.notification.service.FcmService;
+import com.be.dohands.quest.entity.JobQuestEntity;
+import com.be.dohands.quest.entity.JobQuestExpEntity;
+import com.be.dohands.quest.entity.LeaderQuestExpEntity;
+import com.be.dohands.tf.TfExp;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -14,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +47,8 @@ public class SpreadSheetService {
     private final MemberRepository memberRepository;
     private final LevelExpRepository levelExpRepository;
     private final MemberExpRepository memberExpRepository;
+    private final MemberExpService memberExpService;
+    private final FcmService fcmService;
 
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
@@ -49,18 +64,38 @@ public class SpreadSheetService {
 
     public void readAndUpdateArticleSheet(Map<String, Object> payload) {
         articleProcessor.readSheetAndUpdateDb(payload);
+        fcmService.send(new NotificationDto(null, null, ARTICLE));
     }
 
     public void readAndUpdateTfExpSheet(Map<String, Object> payload) {
-        tfExpProcessor.readSheetAndUpdateDb(payload);
+        tfExpProcessor.readSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(Objects::nonNull)
+                .forEach(result -> {
+                    String employeeNumber = result.getEmployeeNumber();
+                    memberExpService.findCompleteQuestWithOutJob("tf", employeeNumber);
+                });
+
     }
 
     public void readAndUpdateJobRequestSheet(Map<String, Object> payload) {
-        jobQuestProcessor.readDividedSheetAndUpdateDb(payload);
+        jobQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(result -> result instanceof JobQuestEntity)
+                .forEach(result -> {
+                    String department = ((JobQuestEntity) result).getDepartment();
+                    memberExpService.findCompleteJobQuest(department);
+                });
     }
 
     public void readAndUpdateLeaderRequestSheet(Map<String, Object> payload) {
-        leaderQuestProcessor.readDividedSheetAndUpdateDb(payload);
+        leaderQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(result -> result instanceof LeaderQuestExpEntity)
+                .forEach(result -> {
+                    String employeeNumber = ((LeaderQuestExpEntity) result).getEmployeeNumber();
+                    memberExpService.findCompleteQuestWithOutJob("leader", employeeNumber);
+                });;
     }
 
     public void readAndUpdateLevelExpSheet(Map<String, Object> payload) {
@@ -68,7 +103,13 @@ public class SpreadSheetService {
     }
 
     public void readAndUpdateEvaluationExpSheet(Map<String, Object> payload) {
-        evaluationProcessor.readDividedSheetAndUpdateDb(payload);
+        evaluationProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(result -> result instanceof EvaluationExp)
+                .forEach(result -> {
+                    String employeeNumber = ((EvaluationExp) result).getEmployeeNumber();
+                    memberExpService.findCompleteQuestWithOutJob("evaluation", employeeNumber);
+                });;
     }
 
 
@@ -90,6 +131,22 @@ public class SpreadSheetService {
         memberProcessor.updateValues(spreadsheetId, sheetLocation, "RAW", values);
     }
 
+    public void changeMemberInfos(String spreadsheetId, Member member)
+        throws GeneralSecurityException, IOException {
+
+        String sheetName = "참고. 구성원 정보";
+        String sheetLocation = sheetName + "!C" + member.getSheetRow() + ":J" + member.getSheetRow() ;
+
+        String levelName = levelExpRepository.findById(member.getLevelId())
+            .map(levelExp -> levelExp.getName())
+            .orElseThrow(() -> new NoSuchElementException("존재하지않는 레벨ID"));
+
+        List<List<Object>> values = new ArrayList<>();
+        values.add(List.of(member.getName(),DateUtil.localDateToString(member.getHireDate()), member.getDepartment(), member.getJobGroup(), levelName, member.getLoginId(), "1234", member.getPassword()));
+
+        memberProcessor.updateValues(spreadsheetId, sheetLocation, "RAW", values);
+    }
+
     /**
      * admin에서 등록한 계정 정보 시트에 자동 추가하는 메서드
      */
@@ -97,7 +154,7 @@ public class SpreadSheetService {
         throws GeneralSecurityException, IOException {
 
         String sheetName = "참고. 구성원 정보";
-        String sheetLocation = sheetName + "!J:J";
+        String sheetLocation = sheetName + "!B:J";
 
         List<List<Object>> values = new ArrayList<>();
         String levelName = levelExpRepository.findById(member.getLevelId())
@@ -122,7 +179,7 @@ public class SpreadSheetService {
 
         Member member = Member.builder()
             .loginId("김테스_두핸즈")
-            .password("1111")
+            .password("1234")
             .employeeNumber("2024011588")
             .department("음성 1센터")
             .name("김테스")

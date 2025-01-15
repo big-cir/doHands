@@ -3,6 +3,7 @@ package com.be.dohands.quest.service;
 import com.be.dohands.quest.dto.QuestRecentDto;
 import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import com.be.dohands.quest.repository.LeaderQuestExpRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,6 @@ public class LeaderQuestExpService {
                 employeeNumber).orElse(null);
 
         if (leaderQuestExp == null) return null;
-        return new QuestRecentDto("leader", leaderQuestExp.getCreatedAt(), leaderQuestExp.getExp());
+        return new QuestRecentDto("leader", LocalDateTime.now(), leaderQuestExp.getExp());
     }
 }

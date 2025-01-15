@@ -9,10 +9,15 @@ import com.be.dohands.notification.repository.FcmTokenRepository;
 import com.google.api.core.ApiFuture;
 import com.google.firebase.messaging.AndroidConfig;
 import com.google.firebase.messaging.AndroidNotification;
+import com.google.firebase.messaging.ApnsConfig;
+import com.google.firebase.messaging.Aps;
+import com.google.firebase.messaging.ApsAlert;
 import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.Notification;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -49,43 +54,76 @@ public class FcmService {
     }
 
     private void getExpNotification(Long userId, Map<String, String> data) {
+        String title = data.get("title");
+        String content = data.get("content");
+        FirebaseMessaging fi = getFirebaseInstance();
         String token = fcmTokenRepository.findByUserId(userId).getToken();
-        getFirebaseInstance().sendAsync(
-                Message.builder()
-                        .setToken(token)
-                        .putAllData(data)
+        Message message = Message.builder()
+                .setToken(token)
+                .putAllData(data)
+                .setAndroidConfig(AndroidConfig.builder()
+                        .setNotification(AndroidNotification.builder()
+                                .setTitle(title)
+                                .setBody(content)
+                                .build()
+                        )
                         .build()
-        );
+                )
+                .setApnsConfig(ApnsConfig.builder()
+                        .setAps(Aps.builder()
+                                .setAlert(ApsAlert.builder()
+                                        .setTitle(title)
+                                        .setBody(content)
+                                        .build())
+                                .build()
+                        )
+                        .build())
+                .build();
+
+        try {
+            fi.send(message);
+        } catch (FirebaseMessagingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void createArticleNotification(Map<String, String> data) {
-        List<String> tokens = fcmTokenRepository.findAll().stream()
+        String title = data.get("title");
+        String content = data.get("content");
+        FirebaseMessaging fi = getFirebaseInstance();
+        fcmTokenRepository.findAll().stream()
                 .map(FcmTokenEntity::getToken)
-                .toList();
+                .forEach(token -> {
+                    Message message = Message.builder()
+                            .setToken(token)
+                            .setAndroidConfig(
+                                    AndroidConfig.builder()
+                                            .setNotification(
+                                                    AndroidNotification.builder()
+                                                            .setTitle(data.get("title"))
+                                                            .setBody(data.get("content"))
+                                                            .build()
+                                            )
+                                            .build()
+                            )
+                            .setApnsConfig(ApnsConfig.builder()
+                                    .setAps(Aps.builder()
+                                            .setAlert(ApsAlert.builder()
+                                                    .setTitle(title)
+                                                    .setBody(content)
+                                                    .build())
+                                            .build()
+                                    )
+                                    .build())
+                            .build();
 
-        ApiFuture<BatchResponse> batchResponseApiFuture = getFirebaseInstance().sendMulticastAsync(
-                MulticastMessage.builder()
-                        .addAllTokens(tokens)
-                        .putAllData(data)
-                        .setAndroidConfig(
-                                AndroidConfig.builder()
-                                        .setNotification(
-                                                AndroidNotification.builder()
-                                                        .setTitle(data.get("title"))
-                                                        .setBody(data.get("content"))
-                                                        .build()
-                                        )
-                                        .build()
-                        )
-                        .build()
-        );
-
-        try {
-            BatchResponse response = batchResponseApiFuture.get();
-            log.info(response.getSuccessCount() + " messages were sent successfully");
-        } catch (InterruptedException | ExecutionException e) {
-            log.info("Error sending message: " + e.getMessage());
-        }
+                            try {
+                                fi.send(message);
+                            } catch (FirebaseMessagingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                );
     }
 
     private FirebaseMessaging getFirebaseInstance() {

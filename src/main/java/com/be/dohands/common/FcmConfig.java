@@ -16,7 +16,7 @@ public class FcmConfig {
     @Value("${firebase.service-account-path}")
     private String serviceAccountPath;
 
-    @Value("${firebase.project-id")
+    @Value("${firebase.project-id}")
     private String projectId;
 
     @Bean
