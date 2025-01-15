@@ -6,18 +6,25 @@ import com.be.dohands.notification.data.NotificationType;
 import com.be.dohands.notification.dto.NotificationDto;
 import com.be.dohands.notification.entity.FcmTokenEntity;
 import com.be.dohands.notification.repository.FcmTokenRepository;
+import com.google.api.core.ApiFuture;
+import com.google.firebase.messaging.AndroidConfig;
+import com.google.firebase.messaging.AndroidNotification;
+import com.google.firebase.messaging.BatchResponse;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FcmService {
 
     private final FcmTokenRepository fcmTokenRepository;
@@ -57,17 +64,29 @@ public class FcmService {
                 .map(FcmTokenEntity::getToken)
                 .toList();
 
-        getFirebaseInstance().sendMulticastAsync(
+        ApiFuture<BatchResponse> batchResponseApiFuture = getFirebaseInstance().sendMulticastAsync(
                 MulticastMessage.builder()
                         .addAllTokens(tokens)
                         .putAllData(data)
-                        .setNotification(
-                                Notification.builder()
-                                        .setTitle(data.get("title"))
-                                        .setBody(data.get("content"))
-                                        .build())
+                        .setAndroidConfig(
+                                AndroidConfig.builder()
+                                        .setNotification(
+                                                AndroidNotification.builder()
+                                                        .setTitle(data.get("title"))
+                                                        .setBody(data.get("content"))
+                                                        .build()
+                                        )
+                                        .build()
+                        )
                         .build()
         );
+
+        try {
+            BatchResponse response = batchResponseApiFuture.get();
+            log.info(response.getSuccessCount() + " messages were sent successfully");
+        } catch (InterruptedException | ExecutionException e) {
+            log.info("Error sending message: " + e.getMessage());
+        }
     }
 
     private FirebaseMessaging getFirebaseInstance() {
