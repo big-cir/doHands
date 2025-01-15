@@ -165,35 +165,6 @@ public class MemberService {
         return new QuestRecentDto("nothing", null, 0);
     }
 
-    public void findRecentCompleteQuestWithOutJob(String type, String employeeNumber) {
-        // questType = {"evaluation", "leader", "tf", "job"};
-        QuestRecentDto recent = null;
-        Long userId = null;
-        if (type.equals(questType[0])) {
-            recent = evaluationExpService.findAllMostRecent(employeeNumber);
-            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
-        } else if (type.equals(questType[1])) {
-            recent = leaderQuestExpService.findAllMostRecent(employeeNumber);
-            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
-        } else if (type.equals(questType[2])) {
-            recent = tfExpService.findAllMostRecent(employeeNumber);
-            userId = memberRepository.findByEmployeeNumber(employeeNumber).get().getUserId();
-        }
-
-        String key = String.valueOf(userId);
-        redisTemplate.opsForValue().set(key, getValue(recent));
-    }
-
-    public void findRecentCompleteJobQuest(String department) {
-        QuestRecentDto recent = jobQuestService.findAllMostRecent(department);
-        if (recent == null) return;
-
-        memberRepository.findMembersByDepartment(department)
-                        .forEach(m -> {
-                            redisTemplate.opsForValue().set(String.valueOf(m.getUserId()), getValue(recent));
-                        });
-    }
-
     @Transactional(readOnly = true)
     public QuestsInProgressResponseDTO getQuestsInProgress(CustomUserDetails user, QuestsInProgressRequestDTO request) {
         List<QuestInProgress> result = new ArrayList<>();
@@ -213,10 +184,6 @@ public class MemberService {
         return QuestsInProgressResponseDTO.builder()
             .questsInProgressList(result)
             .build();
-    }
-
-    private String getValue(QuestRecentDto recent) {
-        return recent.questType() + "|" + recent.createdAt() + "|" + recent.exp();
     }
 
     private String getLevelName(LevelExp level) {

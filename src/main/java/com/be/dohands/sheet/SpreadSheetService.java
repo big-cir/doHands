@@ -1,10 +1,17 @@
 package com.be.dohands.sheet;
 
+import com.be.dohands.evaluation.EvaluationExp;
 import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
+import com.be.dohands.member.service.MemberExpService;
+import com.be.dohands.member.service.MemberService;
+import com.be.dohands.quest.entity.JobQuestEntity;
+import com.be.dohands.quest.entity.JobQuestExpEntity;
+import com.be.dohands.quest.entity.LeaderQuestExpEntity;
+import com.be.dohands.tf.TfExp;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -14,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +42,7 @@ public class SpreadSheetService {
     private final MemberRepository memberRepository;
     private final LevelExpRepository levelExpRepository;
     private final MemberExpRepository memberExpRepository;
+    private final MemberExpService memberExpService;
 
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
@@ -52,15 +61,35 @@ public class SpreadSheetService {
     }
 
     public void readAndUpdateTfExpSheet(Map<String, Object> payload) {
-        tfExpProcessor.readSheetAndUpdateDb(payload);
+        List<TransformResult<TfExp>> transformResults = tfExpProcessor.readSheetAndUpdateDb(payload);
+        tfExpProcessor.readSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(Objects::nonNull)
+                .forEach(result -> {
+                    String employeeNumber = result.getEmployeeNumber();
+                    memberExpService.findCompleteQuestWithOutJob("tf", employeeNumber);
+                });
+
     }
 
     public void readAndUpdateJobRequestSheet(Map<String, Object> payload) {
-        jobQuestProcessor.readDividedSheetAndUpdateDb(payload);
+        jobQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(result -> result instanceof JobQuestEntity)
+                .forEach(result -> {
+                    String department = ((JobQuestEntity) result).getDepartment();
+                    memberExpService.findCompleteJobQuest(department);
+                });
     }
 
     public void readAndUpdateLeaderRequestSheet(Map<String, Object> payload) {
-        leaderQuestProcessor.readDividedSheetAndUpdateDb(payload);
+        leaderQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(result -> result instanceof LeaderQuestExpEntity)
+                .forEach(result -> {
+                    String employeeNumber = ((LeaderQuestExpEntity) result).getEmployeeNumber();
+                    memberExpService.findCompleteQuestWithOutJob("leader", employeeNumber);
+                });;
     }
 
     public void readAndUpdateLevelExpSheet(Map<String, Object> payload) {
@@ -68,7 +97,13 @@ public class SpreadSheetService {
     }
 
     public void readAndUpdateEvaluationExpSheet(Map<String, Object> payload) {
-        evaluationProcessor.readDividedSheetAndUpdateDb(payload);
+        evaluationProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .map(TransformResult::getEntity)
+                .filter(result -> result instanceof EvaluationExp)
+                .forEach(result -> {
+                    String employeeNumber = ((EvaluationExp) result).getEmployeeNumber();
+                    memberExpService.findCompleteQuestWithOutJob("evaluation", employeeNumber);
+                });;
     }
 
 

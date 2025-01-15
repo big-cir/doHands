@@ -99,7 +99,6 @@ public class MemberController {
     @GetMapping("/users/recent-exp")
     public ResponseEntity<QuestRecentDto> getRecentExp(@AuthenticationPrincipal CustomUserDetails user) {
         String loginId = user.getUsername();
-        memberService.findRecentCompleteJobQuest("음성1센터");
         return ResponseEntity.ok(memberService.findRecentQuest(loginId));
     }
 }

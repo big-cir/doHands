@@ -38,11 +38,11 @@ public class MemberAdminService {
             Member member = memberRepository.save(dto.toMember(level != null ? level.getLevelExpId() : null));
             createMemberExp(member.getUserId());
 
-            try {
-                spreadSheetService.createMemberInfoToSheet(spreadsheetId, member);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                spreadSheetService.createMemberInfoToSheet(spreadsheetId, member);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
 
         } else {
             throw new RuntimeException("중복된 사용자 ID");
