@@ -25,23 +25,23 @@ public class BadgeAuto {
     private final EvaluationExpRepository evaluationExpRepository;
     private final TfExpRepository tfExpRepository;
 
-    @Transactional
-    @PostConstruct
-    public void initializeBadge(){
-
-        List<Badge> initializeList = new ArrayList<>();
-        initializeList.add(new Badge("천리길도 한 걸음부터", "첫 경험치 획득"));
-        initializeList.add(new Badge("노력은 배신하지 않는다", "상반기, 하반기 인사평가 S등급"));
-        initializeList.add(new Badge("초심자의 힘", "퀘스트 20개 완료"));
-        initializeList.add(new Badge("지속적인 도전 정신", "퀘스트 50개 완료"));
-        initializeList.add(new Badge("퀘스트 달인", "퀘스트 80개 완료"));
-        initializeList.add(new Badge("무한 성장", "퀘스트 100개 완료"));
-        initializeList.add(new Badge("팀워크의 첫 발걸음", "TF 3개 참여"));
-        initializeList.add(new Badge("팀워크의 달인", "TF 5개 참여"));
-        initializeList.add(new Badge("팀워크의 마스터", "TF 10개 참여"));
-
-        badgeRepository.saveAllAndFlush(initializeList);
-    }
+//    @Transactional
+//    @PostConstruct
+//    public void initializeBadge(){
+//
+//        List<Badge> initializeList = new ArrayList<>();
+//        initializeList.add(new Badge("천리길도 한 걸음부터", "첫 경험치 획득"));
+//        initializeList.add(new Badge("노력은 배신하지 않는다", "상반기, 하반기 인사평가 S등급"));
+//        initializeList.add(new Badge("초심자의 힘", "퀘스트 20개 완료"));
+//        initializeList.add(new Badge("지속적인 도전 정신", "퀘스트 50개 완료"));
+//        initializeList.add(new Badge("퀘스트 달인", "퀘스트 80개 완료"));
+//        initializeList.add(new Badge("무한 성장", "퀘스트 100개 완료"));
+//        initializeList.add(new Badge("팀워크의 첫 발걸음", "TF 3개 참여"));
+//        initializeList.add(new Badge("팀워크의 달인", "TF 5개 참여"));
+//        initializeList.add(new Badge("팀워크의 마스터", "TF 10개 참여"));
+//
+//        badgeRepository.saveAllAndFlush(initializeList);
+//    }
 
 
     @Transactional
