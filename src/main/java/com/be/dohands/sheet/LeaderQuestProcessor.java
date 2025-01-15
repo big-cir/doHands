@@ -169,8 +169,9 @@ public class LeaderQuestProcessor {
             savedLeaderQuestExp.getLeaderQuestId(), member.getUserId(),
             savedLeaderQuestExp.getMonth(), savedLeaderQuestExp.getWeek());
 
-        // TODO: 추후 기존 값과 변경이 없는 경우에만 하도록 constraint 추가 고려
-        memberExpService.addGivenExp(member.getUserId(), entity.getExp());
+        if (notificationYn) {
+            memberExpService.addGivenExp(member.getUserId(), entity.getExp());
+        }
 
         return TransformResult.of(savedLeaderQuestExp, notificationYn);
     }

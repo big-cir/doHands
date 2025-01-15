@@ -84,7 +84,9 @@ public class QuestService {
                 if (userQuest.getStatusType().equals(StatusType.DONE)) {
                     JobQuestEntity jobQuest = jobQuestRepository.findByJobQuestId(e.getQuestId())
                         .orElseThrow(() -> new NoSuchElementException("없는 직무 퀘스트입니다."));
-                    JobQuestExpEntity jobQuestExp = jobQuestExpRepository.findByJobQuestIdAndSheetRow(jobQuest.getJobQuestId(), user.getSheetRow());
+                    JobQuestExpEntity jobQuestExp = jobQuestExpRepository.findByJobQuestIdAndSheetRow(
+                            jobQuest.getJobQuestId(), user.getSheetRow())
+                        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 jobQuestExp"));
                     Integer exp = jobQuestExp.getExp();
                     if (Objects.equals(jobQuest.getMaxExp(), exp)) doneResult = "HIGH";
                     else if (Objects.equals(jobQuest.getMedianExp(), exp)) doneResult = "MIDDLE";
