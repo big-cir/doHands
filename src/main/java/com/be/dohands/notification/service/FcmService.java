@@ -23,8 +23,13 @@ public class FcmService {
 
     @Transactional
     public void saveToken(String token, Long userId) {
-        if (fcmTokenRepository.existsByUserId(userId)) return;
-        fcmTokenRepository.save(new FcmTokenEntity(token, userId));
+        FcmTokenEntity fcmTokenEntity = fcmTokenRepository.findByUserId(userId);
+        if (fcmTokenEntity != null) {
+            fcmTokenEntity.updateToken(token);
+            fcmTokenRepository.save(fcmTokenEntity);
+        } else {
+            fcmTokenRepository.save(new FcmTokenEntity(token, userId));
+        }
     }
 
     public void send(NotificationDto notificationDto) {

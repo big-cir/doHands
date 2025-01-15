@@ -29,4 +29,8 @@ public class FcmTokenEntity extends BaseTimeEntity {
         this.userId = userId;
         this.isActive = true;
     }
+
+    public void updateToken(String token) {
+        this.token = token;
+    }
 }
