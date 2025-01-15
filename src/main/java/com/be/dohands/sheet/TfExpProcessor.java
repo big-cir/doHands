@@ -1,12 +1,15 @@
 package com.be.dohands.sheet;
 
 
+import com.be.dohands.badge.BadgeAuto;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.member.service.MemberExpService;
 import com.be.dohands.tf.TfExp;
 import com.be.dohands.tf.TfExp.TfExpBuilder;
 import com.be.dohands.tf.repository.TfExpRepository;
+import java.time.Year;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -24,7 +27,10 @@ public class TfExpProcessor extends SheetProcessor<TfExp>{
     private final MemberRepository memberRepository;
 
     private final MemberExpService memberExpService;
+    private final BadgeAuto badgeAuto;
 
+    // 퀘스트 생성 시 연도 : 시트 미기재 속성이여서 시스템에서 직접 지정
+    private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
 
     @Override
     protected TransformResult<TfExp> transformRow(List<Object> rows, Integer sheetRow) {
@@ -53,6 +59,9 @@ public class TfExpProcessor extends SheetProcessor<TfExp>{
         if (notificationYn) {
             memberExpService.addGivenExp(member.getUserId(), tfExp.getExp());
         }
+
+        // 뱃지 조건 충족 시 획득
+        badgeAuto.updateBadge(member.getUserId(), YEAR);
 
         return TransformResult.of(tfExp, notificationYn);
     }

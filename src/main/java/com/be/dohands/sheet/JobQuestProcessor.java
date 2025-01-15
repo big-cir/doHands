@@ -1,6 +1,7 @@
 package com.be.dohands.sheet;
 
 
+import com.be.dohands.badge.BadgeAuto;
 import com.be.dohands.common.schedules.GenerateQuests;
 import com.be.dohands.member.Member;
 import com.be.dohands.member.repository.MemberRepository;
@@ -39,6 +40,7 @@ public class JobQuestProcessor {
 
     private final UserQuestService userQuestService;
     private final MemberExpService memberExpService;
+    private final BadgeAuto badgeAuto;
 
     // 퀘스트 생성 시 연도 : 시트 미기재 속성이여서 시스템에서 직접 지정
     private final Integer YEAR = Year.now(ZoneId.of("Asia/Seoul")).getValue();
@@ -143,6 +145,9 @@ public class JobQuestProcessor {
             if (notificationYn) {
                 memberExpService.addGivenExp(member.getUserId(), entity.getExp());
             }
+
+            // 뱃지 조건 충족 시 획득
+            badgeAuto.updateBadge(member.getUserId(), YEAR);
         }
 
         return TransformResult.of(savedJobQuestExp, notificationYn);
