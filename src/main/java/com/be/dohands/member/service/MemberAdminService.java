@@ -46,7 +46,8 @@ public class MemberAdminService {
                     slice.getMembers()
                             .stream()
                             .map(m -> {
-                                LevelExp level = levelExpService.findLevelExp(m.getLevelId());
+                                LevelExp level = null;
+                                if (m.getLevelId() != null) level = levelExpService.findLevelExp(m.getLevelId());
                                 return new MemberResponse(m, getLevelName(level));
                             })
                             .toList(),
