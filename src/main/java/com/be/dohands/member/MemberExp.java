@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
 @Entity
@@ -20,9 +21,11 @@ public class MemberExp extends BaseTimeEntity {
 
     private Integer year;
 
+    @Setter
     @Comment("현재 경험치")
     private Integer currentExp;
 
+    @Setter
     @Comment("누적 경험치")
     private Integer cumulativeExp;
 
