@@ -14,4 +14,7 @@ public interface JobQuestRepository extends JpaRepository<JobQuestEntity, Long> 
     Optional<JobQuestEntity> findBySheetRow(Integer sheetRow);
 
     List<JobQuestEntity> findByYear(Integer year);
+
+    Optional<JobQuestEntity> findJobQuestEntityByDepartmentAndJobGroupAndPeriod(String department, String jobGroup,
+        String period);
 }
