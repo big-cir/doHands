@@ -83,7 +83,9 @@ public class LeaderQuestProcessor {
                 if (rowData.get(0).toString().isEmpty() || rowData.get(0).toString().equals("합산")) {
                     continue;
                 }
-                Optional<LeaderQuestEntity> leaderQuestEntityOptional = leaderQuestRepository.findBySheetRow(rowNumber);
+
+                // sheetRow 없이 department로도 식별 가능할듯 (추후 리펙토링)
+                Optional<LeaderQuestEntity> leaderQuestEntityOptional = leaderQuestRepository.findBySheetRowAndDepartment(rowNumber, department);
 
                 //if, 새로 생성된 거면 -> leaderQuestExp 생성
                 // userQuest 생성
@@ -108,7 +110,7 @@ public class LeaderQuestProcessor {
                     continue;
                 }
 
-                TransformResult transformResult = createLeaderQuestExpTransformResult(rowData,rowNumber);
+                TransformResult transformResult = createLeaderQuestExpTransformResult(rowData,rowNumber, department);
                 results.add(transformResult);
             }
         }
@@ -154,12 +156,18 @@ public class LeaderQuestProcessor {
      * @param : 스프레드 시트 데이터 & 해당하는 LeaderQuestExpEntity
      * @return LeaderQuestExpEntity & 알림 전송 여부
      */
-    public TransformResult<LeaderQuestExpEntity> createLeaderQuestExpTransformResult(List rows, Integer sheetRow) {
+    public TransformResult<LeaderQuestExpEntity> createLeaderQuestExpTransformResult(List rows, Integer sheetRow, String department) {
 
-        Optional<LeaderQuestExpEntity> entityOptional = leaderQuestExpRepository.findBySheetRow(sheetRow);
+        String questName = rows.get(4).toString();
+        LeaderQuestEntity leaderQuestEntity = leaderQuestRepository.findByQuestNameAndDepartment(questName, department)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리더 퀘스트입니다"));
+
+        // expentity는 행과 해당 퀘스트ID(한 시트에서 부서 변경하면서 테스트 용도 위해) 로 식별
+//        Optional<LeaderQuestExpEntity> entityOptional = leaderQuestExpRepository.findBySheetRow(sheetRow);
+        Optional<LeaderQuestExpEntity> entityOptional = leaderQuestExpRepository.findBySheetRowAndLeaderQuestId(sheetRow, leaderQuestEntity.getLeaderQuestId());
 
         // 경험치 변경 여부로 알림 전송 여부 판단
-        LeaderQuestExpEntity entity = makeLeaderQuestExpEntityBySheet(rows, sheetRow, entityOptional);
+        LeaderQuestExpEntity entity = makeLeaderQuestExpEntityBySheet(rows, sheetRow, entityOptional, department);
 
         boolean notificationYn = isNotificationYn(entityOptional, entity.getExp());
         LeaderQuestExpEntity savedLeaderQuestExp = leaderQuestExpRepository.save(entity);
@@ -185,7 +193,7 @@ public class LeaderQuestProcessor {
      * 스프레드 시트 데이터로 JobQuestExpEntity 수정 메서드
      * @return : JobQuestExpEntity
      */
-    private LeaderQuestExpEntity makeLeaderQuestExpEntityBySheet(List rows, Integer sheetRow, Optional<LeaderQuestExpEntity> entityOptional) {
+    private LeaderQuestExpEntity makeLeaderQuestExpEntityBySheet(List rows, Integer sheetRow, Optional<LeaderQuestExpEntity> entityOptional, String department) {
 
         // questName으로 leaderQuest 식별
         Integer givenExp = TypeConversionUtil.toFlatToInteger(rows.get(6).toString());
@@ -194,8 +202,11 @@ public class LeaderQuestProcessor {
         String employeeNumber = rows.get(2).toString();
         String questName = rows.get(4).toString();
 
-        LeaderQuestEntity leaderQuestEntity = leaderQuestRepository.findByQuestName(questName)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 퀘스트명입니다"));
+        // createLeaderQuestExpTransformResult 여기에서 가져와도 됨 - 추후 리펙토링
+//        LeaderQuestEntity leaderQuestEntity = leaderQuestRepository.findByQuestName(questName)
+//            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 퀘스트명입니다"));
+        LeaderQuestEntity leaderQuestEntity = leaderQuestRepository.findByQuestNameAndDepartment(questName, department)
+            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리더 퀘스트입니다"));
 
         LeaderQuestExpEntityBuilder entityBuilder = LeaderQuestExpEntity.builder()
             .leaderQuestId(leaderQuestEntity.getLeaderQuestId())
