@@ -14,7 +14,6 @@ import com.be.dohands.notification.service.FcmService;
 import com.be.dohands.quest.entity.JobQuestEntity;
 import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import com.be.dohands.tf.TfExp;
-import com.be.dohands.tf.repository.TfExpRepository;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,8 +48,6 @@ public class SpreadSheetService {
     private final MemberExpRepository memberExpRepository;
     private final MemberExpService memberExpService;
     private final FcmService fcmService;
-    private final TfExpRepository tfExpRepository;
-
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
         List<TransformResult<Member>> transformResults = memberProcessor.readSheetAndUpdateDb(payload);
@@ -88,9 +84,7 @@ public class SpreadSheetService {
                 .map(result -> ((JobQuestEntity) result).getDepartment())
                 .collect(Collectors.toList());
 
-        CompletableFuture.runAsync(() -> {
-           list.forEach(memberExpService::findCompleteJobQuest);
-        });
+        list.forEach(memberExpService::findCompleteJobQuest);
     }
 
     public void readAndUpdateLeaderRequestSheet(Map<String, Object> payload) {
@@ -101,9 +95,7 @@ public class SpreadSheetService {
                 .map(result -> ((LeaderQuestExpEntity) result).getEmployeeNumber())
                 .collect(Collectors.toSet());
 
-        CompletableFuture.runAsync(() -> {
-            set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("leader", en));
-        });
+        set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("leader", en));
     }
 
     public void readAndUpdateLevelExpSheet(Map<String, Object> payload) {
@@ -118,9 +110,7 @@ public class SpreadSheetService {
                 .map(result -> ((EvaluationExp) result).getEmployeeNumber())
                 .collect(Collectors.toSet());
 
-        CompletableFuture.runAsync(() -> {
-            set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("evaluation", en));
-        });
+        set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("evaluation", en));
     }
 
     public void changeMemberPassword(String spreadsheetId, String password, Long userId)
