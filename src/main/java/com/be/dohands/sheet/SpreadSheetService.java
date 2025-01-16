@@ -9,14 +9,12 @@ import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
 import com.be.dohands.member.service.MemberExpService;
-import com.be.dohands.member.service.MemberService;
-import com.be.dohands.notification.data.NotificationType;
 import com.be.dohands.notification.dto.NotificationDto;
 import com.be.dohands.notification.service.FcmService;
 import com.be.dohands.quest.entity.JobQuestEntity;
-import com.be.dohands.quest.entity.JobQuestExpEntity;
 import com.be.dohands.quest.entity.LeaderQuestExpEntity;
 import com.be.dohands.tf.TfExp;
+import com.be.dohands.tf.repository.TfExpRepository;
 import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -27,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,7 @@ public class SpreadSheetService {
     private final MemberExpRepository memberExpRepository;
     private final MemberExpService memberExpService;
     private final FcmService fcmService;
+    private final TfExpRepository tfExpRepository;
 
 
     public void readAndUpdateMemberSheet(Map<String, Object> payload) {
@@ -68,34 +70,42 @@ public class SpreadSheetService {
     }
 
     public void readAndUpdateTfExpSheet(Map<String, Object> payload) {
-        tfExpProcessor.readSheetAndUpdateDb(payload).stream()
+        Set<String> set = tfExpProcessor.readSheetAndUpdateDb(payload).stream()
+                .filter(TransformResult::isNotificationYn)
                 .map(TransformResult::getEntity)
                 .filter(Objects::nonNull)
-                .forEach(result -> {
-                    String employeeNumber = result.getEmployeeNumber();
-                    memberExpService.findCompleteQuestWithOutJob("tf", employeeNumber);
-                });
+                .map(TfExp::getEmployeeNumber)
+                .collect(Collectors.toSet());
 
+        CompletableFuture.runAsync(() -> {
+            set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("tf", en));
+        });
     }
 
     public void readAndUpdateJobRequestSheet(Map<String, Object> payload) {
-        jobQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+        List<String> list = jobQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .filter(TransformResult::isNotificationYn)
                 .map(TransformResult::getEntity)
                 .filter(result -> result instanceof JobQuestEntity)
-                .forEach(result -> {
-                    String department = ((JobQuestEntity) result).getDepartment();
-                    memberExpService.findCompleteJobQuest(department);
-                });
+                .map(result -> ((JobQuestEntity) result).getDepartment())
+                .collect(Collectors.toList());
+
+        CompletableFuture.runAsync(() -> {
+           list.forEach(memberExpService::findCompleteJobQuest);
+        });
     }
 
     public void readAndUpdateLeaderRequestSheet(Map<String, Object> payload) {
-        leaderQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+        Set<String> set = leaderQuestProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .filter(TransformResult::isNotificationYn)
                 .map(TransformResult::getEntity)
                 .filter(result -> result instanceof LeaderQuestExpEntity)
-                .forEach(result -> {
-                    String employeeNumber = ((LeaderQuestExpEntity) result).getEmployeeNumber();
-                    memberExpService.findCompleteQuestWithOutJob("leader", employeeNumber);
-                });;
+                .map(result -> ((LeaderQuestExpEntity) result).getEmployeeNumber())
+                .collect(Collectors.toSet());
+
+        CompletableFuture.runAsync(() -> {
+            set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("leader", en));
+        });
     }
 
     public void readAndUpdateLevelExpSheet(Map<String, Object> payload) {
@@ -103,15 +113,17 @@ public class SpreadSheetService {
     }
 
     public void readAndUpdateEvaluationExpSheet(Map<String, Object> payload) {
-        evaluationProcessor.readDividedSheetAndUpdateDb(payload).stream()
+        Set<String> set = evaluationProcessor.readDividedSheetAndUpdateDb(payload).stream()
+                .filter(TransformResult::isNotificationYn)
                 .map(TransformResult::getEntity)
                 .filter(result -> result instanceof EvaluationExp)
-                .forEach(result -> {
-                    String employeeNumber = ((EvaluationExp) result).getEmployeeNumber();
-                    memberExpService.findCompleteQuestWithOutJob("evaluation", employeeNumber);
-                });;
-    }
+                .map(result -> ((EvaluationExp) result).getEmployeeNumber())
+                .collect(Collectors.toSet());
 
+        CompletableFuture.runAsync(() -> {
+            set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("evaluation", en));
+        });
+    }
 
     public void changeMemberPassword(String spreadsheetId, String password, Long userId)
         throws GeneralSecurityException, IOException {

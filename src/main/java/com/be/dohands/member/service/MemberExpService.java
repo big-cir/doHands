@@ -6,18 +6,17 @@ import com.be.dohands.evaluation.service.EvaluationExpService;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
-import com.be.dohands.notification.data.NotificationType;
 import com.be.dohands.notification.dto.NotificationDto;
 import com.be.dohands.notification.service.FcmService;
 import com.be.dohands.quest.dto.QuestRecentDto;
 import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.quest.service.LeaderQuestExpService;
 import com.be.dohands.tf.service.TfExpService;
-import jakarta.transaction.Transactional;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
