@@ -1,6 +1,9 @@
 package com.be.dohands.sheet;
 
 
+import static com.be.dohands.member.Role.ROLE_ADMIN;
+import static com.be.dohands.member.Role.ROLE_USER;
+
 import com.be.dohands.level.LevelExp;
 import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.member.Member;
@@ -43,11 +46,17 @@ public class MemberProcessor extends SheetProcessor<Member>{
             .password(password)
             .sheetRow(sheetRow);
 
-        memberOptional.ifPresent(existMember ->
+        memberOptional.ifPresent(existMember -> {
             memberBuilder.userId(existMember.getUserId())
-                .skinId(existMember.getSkinId())
-                .characterType(existMember.getCharacterType())
-        );
+                    .skinId(existMember.getSkinId())
+                    .characterType(existMember.getCharacterType());
+
+            if (existMember.getRole().equals(ROLE_ADMIN)) {
+                memberBuilder.role(ROLE_ADMIN);
+            } else {
+                memberBuilder.role(ROLE_USER);
+            }
+        });
 
         Member member = memberBuilder.build();
 
