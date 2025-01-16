@@ -68,11 +68,13 @@ public class QuestService {
                 .orElseThrow(() -> new NoSuchElementException("퀘스트 스케쥴이 없습니다."));
             UserQuestEntity userQuest = userQuestRepository.findByQuestScheduleIdAndUserId(questSchedule.getQuestScheduleId(), userId);
 
-            if (e.getQuestType().equals(QuestType.LEADER)) {LeaderQuestEntity leaderQuest = leaderQuestRepository.findByLeaderQuestId(e.getQuestId())
+            if (e.getQuestType().equals(QuestType.LEADER)) {
+                LeaderQuestEntity leaderQuest = leaderQuestRepository.findByLeaderQuestId(e.getQuestId())
                     .orElseThrow(() -> new NoSuchElementException("리더 퀘스트를 찾을 수 없습니다."));
                 questName = leaderQuest.getQuestName();
                 if (questSchedule.getMonth() != null) month = questSchedule.getMonth();
                 else week = questSchedule.getWeek();
+
                 if (userQuest.getStatusType().equals(StatusType.DONE)) {
                     LeaderQuestExpEntity leaderQuestExp = leaderQuestExpRepository.findByLeaderQuestIdAndEmployeeNumber(
                         leaderQuest.getLeaderQuestId(), user.getEmployeeNumber());
@@ -83,11 +85,12 @@ public class QuestService {
             } else {
                 if (questSchedule.getMonth() != null) month = questSchedule.getMonth();
                 else week = questSchedule.getWeek();
+
                 if (userQuest.getStatusType().equals(StatusType.DONE)) {
                     JobQuestEntity jobQuest = jobQuestRepository.findByJobQuestId(e.getQuestId())
                         .orElseThrow(() -> new NoSuchElementException("없는 직무 퀘스트입니다."));
                     JobQuestExpEntity jobQuestExp = jobQuestExpRepository.findByJobQuestIdAndSheetRow(
-                            jobQuest.getJobQuestId(), user.getSheetRow())
+                            jobQuest.getJobQuestId(), jobQuest.getSheetRow())
                         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 jobQuestExp"));
                     Integer exp = jobQuestExp.getExp();
                     if (Objects.equals(jobQuest.getMaxExp(), exp)) doneResult = "HIGH";
