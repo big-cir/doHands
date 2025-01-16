@@ -58,7 +58,7 @@ public class GenerateQuests {
                 .questId(jobQuest.getJobQuestId())
                 .build();
             questScheduleRepository.save(questSchedule);
-            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), questSchedule, month, null);
+            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(),jobQuest.getJobGroup(), questSchedule, month, null);
         }
     }
 
@@ -72,7 +72,7 @@ public class GenerateQuests {
                 .questId(jobQuest.getJobQuestId())
                 .build();
             questScheduleRepository.save(questSchedule);
-            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), questSchedule, null, week);
+            generateUserQuests(QuestType.JOB, jobQuest.getJobQuestId(), jobQuest.getDepartment(), jobQuest.getJobGroup(), questSchedule, null, week);
         }
     }
 
@@ -105,8 +105,8 @@ public class GenerateQuests {
         }
     }
 
-    public void generateUserQuests(QuestType questType, Long questId, String department, QuestScheduleEntity questSchedule){
-        List<Member> departmentMembers = memberRepository.findMembersByDepartment(department);
+    public void generateUserQuests(QuestType questType, Long questId, String department, String jobGroup, QuestScheduleEntity questSchedule, Integer month, Integer week){
+        List<Member> departmentMembers = memberRepository.findMembersByDepartmentAndJobGroup(department, jobGroup);
         departmentMembers.stream().map(member -> UserQuestEntity.builder()
             .questType(questType)
             .questId(questId)
