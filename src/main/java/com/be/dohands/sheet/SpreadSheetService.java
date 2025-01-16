@@ -77,9 +77,7 @@ public class SpreadSheetService {
                 .map(TfExp::getEmployeeNumber)
                 .collect(Collectors.toSet());
 
-        CompletableFuture.runAsync(() -> {
-            set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("tf", en));
-        });
+        set.forEach(en -> memberExpService.findCompleteQuestWithOutJob("tf", en));
     }
 
     public void readAndUpdateJobRequestSheet(Map<String, Object> payload) {
