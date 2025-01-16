@@ -9,6 +9,7 @@ import com.be.dohands.common.security.CustomUserDetails;
 import com.be.dohands.evaluation.repository.EvaluationExpQueryRepository;
 import com.be.dohands.evaluation.service.EvaluationExpService;
 import com.be.dohands.level.LevelExp;
+import com.be.dohands.level.repository.LevelExpRepository;
 import com.be.dohands.level.service.LevelExpService;
 import com.be.dohands.member.dto.MemberInfoResponseDTO;
 import com.be.dohands.member.dto.MemberResponse;
@@ -72,6 +73,7 @@ public class MemberService {
     private final LeaderQuestRepository leaderQuestRepository;
     private final MemberArticleRepository memberArticleRepository;
     private final ArticleRepository articleRepository;
+    private final LevelExpRepository levelExpRepository;
 
     private final JobQuestService jobQuestService;
     private final LevelExpService levelExpService;
@@ -138,13 +140,13 @@ public class MemberService {
 
         Member user = memberRepository.findByLoginId(loginId).get();
         Integer unreadArticles = articleRepository.findAll().size() - memberArticleRepository.countUnreadArticles(user.getUserId());
-
+        LevelExp level = levelExpRepository.findByLevelExpId(user.getLevelId());
         return MemberInfoResponseDTO.builder()
             .employeeNumber(user.getEmployeeNumber())
             .name(user.getName())
             .department(user.getDepartment())
             .characterType(user.getCharacterType())
-            .levelName(user.getName())
+            .levelName(level.getName())
             .hireDate(user.getHireDate())
             .jobCategory(user.getJobCategory())
             .skinId(user.getSkinId())
