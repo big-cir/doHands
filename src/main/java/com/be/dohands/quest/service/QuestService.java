@@ -76,8 +76,7 @@ public class QuestService {
                 else week = questSchedule.getWeek();
 
                 if (e.getStatusType().equals(StatusType.DONE)) {
-                    LeaderQuestExpEntity leaderQuestExp = leaderQuestExpRepository.findByLeaderQuestIdAndEmployeeNumber(
-                        leaderQuest.getLeaderQuestId(), user.getEmployeeNumber());
+                    LeaderQuestExpEntity leaderQuestExp = leaderQuestExpRepository.findByLeaderQuestExpId(e.getQuestExpId()).get();
                     Integer exp = leaderQuestExp.getExp();
                     if (Objects.equals(leaderQuest.getMaxExp(), exp)) doneResult = "HIGH";
                     else if (Objects.equals(leaderQuest.getMedianExp(), exp)) doneResult = "MIDDLE";
