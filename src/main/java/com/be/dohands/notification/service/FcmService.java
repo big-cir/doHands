@@ -47,7 +47,7 @@ public class FcmService {
     public void send(NotificationDto notificationDto) {
         NotificationType type = notificationDto.notificationType();
         if (type.equals(EXP)) {
-            getExpNotification(notificationDto.userId(), type.getData());
+            getExpNotification(notificationDto.userId(), type.getData(notificationDto.exp()));
         } else {
             createArticleNotification(type.getData());
         }

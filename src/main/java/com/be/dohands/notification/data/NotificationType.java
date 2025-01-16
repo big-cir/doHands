@@ -13,7 +13,7 @@ public enum NotificationType {
             return data;
         }
     },
-    EXP("경험치 획득 알림", " EXP를 획득했습니다.") {
+    EXP("경험치 획득 알림", "EXP를 획득했습니다.") {
         @Override
         public Map<String, String> getData(Object... obj) {
             int exp = 0;
