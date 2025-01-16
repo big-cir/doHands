@@ -114,6 +114,8 @@ public class GenerateQuests {
             .userId(member.getUserId())
             .questScheduleId(questSchedule.getQuestScheduleId())
             .statusType(StatusType.NOT_STARTED)
+            .month(month)
+            .week(week)
             .build()).forEach(userQuestRepository::save);
     }
 
