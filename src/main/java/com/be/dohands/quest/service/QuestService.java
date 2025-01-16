@@ -71,6 +71,8 @@ public class QuestService {
             if (e.getQuestType().equals(QuestType.LEADER)) {LeaderQuestEntity leaderQuest = leaderQuestRepository.findByLeaderQuestId(e.getQuestId())
                     .orElseThrow(() -> new NoSuchElementException("리더 퀘스트를 찾을 수 없습니다."));
                 questName = leaderQuest.getQuestName();
+                if (questSchedule.getMonth() != null) month = questSchedule.getMonth();
+                else week = questSchedule.getWeek();
                 if (userQuest.getStatusType().equals(StatusType.DONE)) {
                     LeaderQuestExpEntity leaderQuestExp = leaderQuestExpRepository.findByLeaderQuestIdAndEmployeeNumber(
                         leaderQuest.getLeaderQuestId(), user.getEmployeeNumber());
