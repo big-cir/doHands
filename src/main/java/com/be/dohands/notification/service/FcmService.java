@@ -45,13 +45,16 @@ public class FcmService {
         }
     }
 
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void send(NotificationDto notificationDto) {
         NotificationType type = notificationDto.notificationType();
-        if (type.equals(EXP)) {
-            getExpNotification(notificationDto.userId(), type.getData(notificationDto.exp()));
-        } else {
-            createArticleNotification(type.getData());
+        try {
+            if (type.equals(EXP)) {
+                getExpNotification(notificationDto.userId(), type.getData(notificationDto.exp()));
+            } else {
+                createArticleNotification(type.getData());
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 
