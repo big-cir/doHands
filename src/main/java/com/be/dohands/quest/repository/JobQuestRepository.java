@@ -9,7 +9,7 @@ public interface JobQuestRepository extends JpaRepository<JobQuestEntity, Long> 
 
     List<JobQuestEntity> findJobQuestsByDepartment(String department);
 
-    Optional<JobQuestEntity> findByJobQuestId(Long questId);
+    Optional<JobQuestEntity> findByJobQuestId(Long jobQuestId);
 
     Optional<JobQuestEntity> findBySheetRow(Integer sheetRow);
 
