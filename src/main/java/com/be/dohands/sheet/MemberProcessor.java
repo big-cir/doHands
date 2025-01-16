@@ -26,6 +26,9 @@ public class MemberProcessor extends SheetProcessor<Member>{
         String password = (rows.get(8).toString().isEmpty()) ? rows.get(7).toString() : rows.get(8).toString();
         String givenLevel = rows.get(5).toString();
 
+        // 시트에는 직군이 없음 - 레벨에서 파싱
+        String jobCategory = givenLevel.split(" ")[0];
+
         Long levelExpId = getLevelExpId(givenLevel);
 
         MemberBuilder memberBuilder = Member.builder()
@@ -35,6 +38,7 @@ public class MemberProcessor extends SheetProcessor<Member>{
             .department(rows.get(3).toString())
             .jobGroup(rows.get(4).toString())
             .levelId(levelExpId)
+            .jobCategory(jobCategory)
             .loginId(rows.get(6).toString())
             .password(password)
             .sheetRow(sheetRow);
