@@ -14,4 +14,8 @@ public interface LeaderQuestRepository extends JpaRepository<LeaderQuestEntity, 
     Optional<LeaderQuestEntity> findBySheetRow(Integer sheetRow);
 
     Optional<LeaderQuestEntity> findByQuestName(String questName);
+
+    Optional<LeaderQuestEntity> findBySheetRowAndDepartment(int sheetRow, String department);
+
+    Optional<LeaderQuestEntity> findByQuestNameAndDepartment(String questName, String department);
 }

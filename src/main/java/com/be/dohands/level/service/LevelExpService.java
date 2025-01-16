@@ -25,7 +25,6 @@ public class LevelExpService {
 
     @Transactional(readOnly = true)
     public List<LevelExp> findLevelExpByCategory(String jobCategory) {
-        System.out.println(jobCategory);
         return levelExpRepository.findLevelExpsByJobGroupStartingWith(jobCategory);
     }
 

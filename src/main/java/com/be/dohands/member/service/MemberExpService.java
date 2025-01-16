@@ -6,21 +6,23 @@ import com.be.dohands.evaluation.service.EvaluationExpService;
 import com.be.dohands.member.MemberExp;
 import com.be.dohands.member.repository.MemberExpRepository;
 import com.be.dohands.member.repository.MemberRepository;
-import com.be.dohands.notification.data.NotificationType;
 import com.be.dohands.notification.dto.NotificationDto;
 import com.be.dohands.notification.service.FcmService;
 import com.be.dohands.quest.dto.QuestRecentDto;
 import com.be.dohands.quest.service.JobQuestService;
 import com.be.dohands.quest.service.LeaderQuestExpService;
 import com.be.dohands.tf.service.TfExpService;
-import jakarta.transaction.Transactional;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberExpService {
 
     private final MemberExpRepository memberExpRepository;
@@ -59,11 +61,12 @@ public class MemberExpService {
         }
 
         String key = String.valueOf(userId);
-        if (userId != null) {
+        if (userId != null && recent != null) {
             fcmService.send(new NotificationDto(userId, recent.exp(), EXP));
+            redisTemplate.opsForValue().set(key, getValue(recent));
+        } else {
+            log.info("userId: {} or recent: {} is null", userId, recent);
         }
-
-        redisTemplate.opsForValue().set(key, getValue(recent));
     }
 
     public void findCompleteJobQuest(String department) {
