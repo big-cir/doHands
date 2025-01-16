@@ -41,6 +41,7 @@ public class MemberProcessor extends SheetProcessor<Member>{
             .department(rows.get(3).toString())
             .jobGroup(rows.get(4).toString())
             .levelId(levelExpId)
+            .role(ROLE_USER)
             .jobCategory(jobCategory)
             .loginId(rows.get(6).toString())
             .password(password)

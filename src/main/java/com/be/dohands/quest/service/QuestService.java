@@ -66,7 +66,7 @@ public class QuestService {
 
             QuestScheduleEntity questSchedule = questScheduleRepository.findByQuestScheduleId(e.getQuestScheduleId())
                 .orElseThrow(() -> new NoSuchElementException("퀘스트 스케쥴이 없습니다."));
-            UserQuestEntity userQuest = userQuestRepository.findByQuestScheduleIdAndUserId(questSchedule.getQuestScheduleId(), userId);
+//            UserQuestEntity userQuest = userQuestRepository.findByQuestScheduleIdAndUserId(questSchedule.getQuestScheduleId(), userId);
 
             if (e.getQuestType().equals(QuestType.LEADER)) {
                 LeaderQuestEntity leaderQuest = leaderQuestRepository.findByLeaderQuestId(e.getQuestId())
@@ -75,7 +75,7 @@ public class QuestService {
                 if (questSchedule.getMonth() != null) month = questSchedule.getMonth();
                 else week = questSchedule.getWeek();
 
-                if (userQuest.getStatusType().equals(StatusType.DONE)) {
+                if (e.getStatusType().equals(StatusType.DONE)) {
                     LeaderQuestExpEntity leaderQuestExp = leaderQuestExpRepository.findByLeaderQuestIdAndEmployeeNumber(
                         leaderQuest.getLeaderQuestId(), user.getEmployeeNumber());
                     Integer exp = leaderQuestExp.getExp();
@@ -86,7 +86,7 @@ public class QuestService {
                 if (questSchedule.getMonth() != null) month = questSchedule.getMonth();
                 else week = questSchedule.getWeek();
 
-                if (userQuest.getStatusType().equals(StatusType.DONE)) {
+                if (e.getStatusType().equals(StatusType.DONE)) {
                     JobQuestEntity jobQuest = jobQuestRepository.findByJobQuestId(e.getQuestId())
                         .orElseThrow(() -> new NoSuchElementException("없는 직무 퀘스트입니다."));
                     JobQuestExpEntity jobQuestExp = jobQuestExpRepository.findByJobQuestIdAndSheetRow(
@@ -105,7 +105,7 @@ public class QuestService {
                 .week(week)
                 .questType(e.getQuestType())
                 .statusType(e.getStatusType())
-                .userQuestId(userQuest.getUserQuestId())
+                .userQuestId(e.getUserQuestId())
                 .result(doneResult)
                 .build();
         }).toList());
