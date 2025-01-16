@@ -13,6 +13,7 @@ public class QuestsInProgressResponseDTO {
     @Builder.Default
     List<QuestInProgress> questsInProgressList = new ArrayList<>();
 
+    @Getter
     public static class QuestInProgress{
        private String questName;
        private QuestType questType;
