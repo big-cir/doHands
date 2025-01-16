@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -44,6 +45,7 @@ public class FcmService {
         }
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void send(NotificationDto notificationDto) {
         NotificationType type = notificationDto.notificationType();
         if (type.equals(EXP)) {
