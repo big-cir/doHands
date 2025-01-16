@@ -18,11 +18,15 @@ public class QuestsInProgressResponseDTO {
        private String questName;
        private QuestType questType;
        private StatusType statusType;
+       private Integer maxExp;
+       private Integer medianExp;
 
-        public QuestInProgress(String questName, QuestType questType, StatusType statusType) {
+        public QuestInProgress(String questName, QuestType questType, StatusType statusType, Integer maxExp, Integer medianExp) {
             this.questName = questName;
             this.questType = questType;
             this.statusType = statusType;
+            this.maxExp = maxExp;
+            this.medianExp = medianExp;
         }
     }
 }

@@ -19,9 +19,12 @@ import com.be.dohands.member.dto.QuestsInProgressResponseDTO.QuestInProgress;
 import com.be.dohands.member.dto.UpdateCharacterDto;
 import com.be.dohands.quest.data.QuestType;
 import com.be.dohands.quest.dto.QuestRecentDto;
+import com.be.dohands.quest.entity.JobQuestEntity;
 import com.be.dohands.quest.entity.JobQuestExpEntity;
+import com.be.dohands.quest.entity.LeaderQuestEntity;
 import com.be.dohands.quest.entity.QuestScheduleEntity;
 import com.be.dohands.quest.entity.UserQuestEntity;
+import com.be.dohands.quest.repository.JobQuestRepository;
 import com.be.dohands.quest.repository.LeaderQuestRepository;
 import com.be.dohands.quest.repository.QuestScheduleRepository;
 import com.be.dohands.quest.repository.UserQuestRepository;
@@ -74,6 +77,7 @@ public class MemberService {
     private final MemberArticleRepository memberArticleRepository;
     private final ArticleRepository articleRepository;
     private final LevelExpRepository levelExpRepository;
+    private final JobQuestRepository jobQuestRepository;
 
     private final JobQuestService jobQuestService;
     private final LevelExpService levelExpService;
@@ -201,8 +205,20 @@ public class MemberService {
         for (QuestScheduleEntity q : questWeekSchedules) {
             UserQuestEntity userQuest = userQuestRepository.findByQuestScheduleIdAndUserId(q.getQuestScheduleId(), userId);
             String questName = null;
-            if (userQuest.getQuestType() == QuestType.LEADER) questName = leaderQuestRepository.findByLeaderQuestId(userQuest.getQuestId()).get().getQuestName();
-            QuestInProgress questInProgress = new QuestInProgress(questName, userQuest.getQuestType(), userQuest.getStatusType());
+            Integer maxExp = null, medianExp = null;
+            if (userQuest.getQuestType() == QuestType.LEADER) {
+                LeaderQuestEntity leaderQuest = leaderQuestRepository.findByLeaderQuestId(userQuest.getQuestId()).get();
+                questName = leaderQuest.getQuestName();
+                maxExp = leaderQuest.getMaxExp();
+                medianExp = leaderQuest.getMedianExp();
+            }
+            else {
+                JobQuestEntity jobQuest = jobQuestRepository.findByJobQuestId(userQuest.getQuestId()).get();
+                maxExp = jobQuest.getMaxExp();
+                medianExp = jobQuest.getMedianExp();
+
+            }
+            QuestInProgress questInProgress = new QuestInProgress(questName, userQuest.getQuestType(), userQuest.getStatusType(), maxExp, medianExp);
             questsInProgressList.add(questInProgress);
         }
     }
