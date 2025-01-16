@@ -75,6 +75,12 @@ public class JobQuestProcessor {
             for (Map<String, Object> row : data2) {
                 int rowNumber = (int) row.get("rowNumber");
                 List<Object> rowData = (List<Object>) row.get("rowData");
+
+                Integer givenExp = TypeConversionUtil.toInteger(rowData.get(1));
+                if (givenExp == null) {
+                    continue;
+                }
+
                 TransformResult transformResult = makeJobQuestExpTransformResult(rowData,rowNumber,jobQuestEntity);
                 results.add(transformResult);
             }
@@ -137,7 +143,6 @@ public class JobQuestProcessor {
             jobQuestEntity.getDepartment(), jobQuestEntity.getJobGroup());
 
         for (Member member : memberList) {
-            System.out.println(member.toString());
             userQuestService.changeStatusTypeToDoneAndInsertExpId(savedJobQuestExp.getJobQuestExpId(), QuestType.JOB,
                 savedJobQuestExp.getJobQuestId(), member.getUserId(),
                 savedJobQuestExp.getMonth(), savedJobQuestExp.getWeek());
@@ -158,7 +163,7 @@ public class JobQuestProcessor {
      * @return : JobQuestExpEntity
      */
     private JobQuestExpEntity makeJobQuestExpEntityBySheet(List rows, Integer sheetRow, JobQuestEntity jobQuestEntity, Optional<JobQuestExpEntity> jobQuestExpEntityOptional) {
-        Integer givenExp = TypeConversionUtil.toInteger(rows.get(1).toString());
+        Integer givenExp = TypeConversionUtil.toInteger(rows.get(1));
         JobQuestExpEntityBuilder jobQuestExpEntityBuilder = JobQuestExpEntity.builder()
             .exp(givenExp)
             .notes(rows.get(2).toString())
