@@ -96,9 +96,10 @@ public class MemberService {
 
         String employeeNumber = member.getEmployeeNumber();
         String department = member.getDepartment();
+        String jobGroup = member.getJobGroup();
 
-        return findQuestExpWithoutJobQuestByEmployeeNumber(employeeNumber, department, multiCursor,
-                questExpConditionDto.size());
+        return findQuestExpWithoutJobQuestByEmployeeNumber(employeeNumber, department, jobGroup, multiCursor,
+            questExpConditionDto.size());
     }
 
     @Transactional(readOnly = true)
@@ -223,7 +224,7 @@ public class MemberService {
         }
     }
 
-    private MultiCursorResult<QuestExpDto> findQuestExpWithoutJobQuestByEmployeeNumber(String employeeNumber, String department, MultiCursor multiCursor, int size) {
+    private MultiCursorResult<QuestExpDto> findQuestExpWithoutJobQuestByEmployeeNumber(String employeeNumber, String department, String jobGroup, MultiCursor multiCursor, int size) {
         List<QuestExpDto> questExpDtos = new ArrayList<>();
         Map<String, String> typeCount = new HashMap<>();
 
@@ -243,7 +244,7 @@ public class MemberService {
         questExpDtos.addAll(tfResult.items());
 
         QuestResult jobQuestResult = processQuestType(
-                () -> findJobQuestExpByDepartment(department, multiCursor.getJobQuestExpCursor(), size),
+                () -> findJobQuestExpByDepartmentAndJobGroup(department, jobGroup, multiCursor.getJobQuestExpCursor(), size),
                 quest -> new QuestExpDto(quest.getJobQuestExpId(), quest.getProductivity().toString(), quest.getExp(), questType[3], quest.getCreatedAt()));
         questExpDtos.addAll(jobQuestResult.items());
 
@@ -279,5 +280,9 @@ public class MemberService {
 
     private CursorResult<JobQuestExpEntity> findJobQuestExpByDepartment(String department, String cursor, int size) {
         return jobQuestService.findJobQuestExpByDepartment(department, cursor, size);
+    }
+
+    private CursorResult<JobQuestExpEntity> findJobQuestExpByDepartmentAndJobGroup(String department, String jobGroup, String cursor, int size) {
+        return jobQuestService.findJobQuestExpByDepartmentAndJobGroup(department, jobGroup, cursor, size);
     }
 }

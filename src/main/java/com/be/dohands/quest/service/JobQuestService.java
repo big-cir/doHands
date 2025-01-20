@@ -33,4 +33,15 @@ public class JobQuestService {
                 .collect(Collectors.toList());
         return jobQuestExpService.findAllMostRecent(ids);
     }
+
+    public CursorResult<JobQuestExpEntity> findJobQuestExpByDepartmentAndJobGroup(String department, String jobGroup,
+        String cursor, int size) {
+
+        List<Long> ids = jobQuestRepository.findJobQuestsByDepartmentAndJobGroup(department, jobGroup)
+            .stream()
+            .map(JobQuestEntity::getJobQuestId)
+            .toList();
+
+        return jobQuestExpService.findJobQuestDetailByIds(ids, cursor, size);
+    }
 }
